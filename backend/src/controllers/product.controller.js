@@ -32,6 +32,16 @@ export const getAllProducts = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+export const getCataProducts = async (req, res) => {
+  try {
+    console.log("Hit")
+    const products = await Product.find().sort({ createdAt: -1 }); // Fetch all products
+    res.status(200).json({ products });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
 
 export const getFlashSaleProducts = async (req, res) => {
   try {
@@ -78,6 +88,27 @@ export const updateInStock = async (req, res) => {
     res
       .status(200)
       .json({ message: "Product inStock status updated", product });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+export const updateStockNumber = async (req, res) => {
+  const { productId } = req.body; // Get product ID from request params
+  const { stock } = req.body; // Get the inStock value from request body
+
+  try {
+    const product = await Product.findById(productId); // Find product by ID
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    product.stock = stock; // Update inStock value
+    await product.save(); // Save the updated product
+
+    res
+      .status(200)
+      .json({ message: "Product Stock updated", product });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Server error" });
