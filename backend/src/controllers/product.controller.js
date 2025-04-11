@@ -1,3 +1,4 @@
+import { Order } from "../models/order.model.js";
 import { Product } from "../models/product.models.js";
 
 export const addProduct = async (req, res) => {
@@ -137,3 +138,6 @@ export const updateFlashSale = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+
+

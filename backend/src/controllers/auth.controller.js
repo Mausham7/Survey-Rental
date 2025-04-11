@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.models.js";
 import bcrypt from "bcryptjs";
+import sendEmail from "../middlewares/sendEmail.js";
 
 const createJwtToken = (user) => {
   return jwt.sign(
@@ -45,7 +46,7 @@ export const register = async (req, res) => {
   try {
     let user = await User.findOne({ email });
     if (user) {
-      console.log("User already exists")
+      console.log("User already exists");
       return res.status(400).json({ error: "User already exists" });
     }
 
@@ -58,12 +59,16 @@ export const register = async (req, res) => {
       role,
     });
     await user.save();
-    console.log(user)
+    console.log(user);
     const jwtToken = createJwtToken(user);
+    await sendEmail({
+      email: email,
+      subject: "Congratulations your account has been created!",
+      message: "Dear customer, we to survey rental",
+    });
     res.status(201).json({ token: jwtToken, user });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ error: "Server error" });
   }
 };
-

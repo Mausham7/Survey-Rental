@@ -16,9 +16,12 @@ export const updateInStock = `${url}/admin/stockchange`
 export const editStock = `${url}/admin/updatestocknumber`
 export const updateInFlashSale = `${url}/admin/flashsalechange`
 export const create_order = `${url}/user/createorder`
+export const create_multiple_order = `${url}/user/createmultipleorders`
 export const get_all_orders = `${url}/admin/order/getallorders`
 export const get_my_orders = `${url}/user/order/getmyorders`
 export const update_order = `${url}/admin/order/update`
+export const get_notification = `${url}/user/getnotifications`
+export const get_All_Users = `${url}/admin/getallusers`
 
 
 export const get_profile = `${url}/user/getprofile`

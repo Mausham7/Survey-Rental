@@ -21,6 +21,12 @@ const orderSchema = new mongoose.Schema({
     default: "processing",
     enum: ["processing", "shipped", "delivered", "completed", "cancelled"],
   },
+  paymentStatus: {
+    type: String,
+    default: "pending",
+    enum: ["pending", "paid"],
+    default:"pending"
+  },
 
   fullName: {
     type: String,
@@ -43,15 +49,18 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  trackingNumber: {
+    type: String,
+    required: true,
+  },
   phone: {
     type: String,
     default: "+977 9800000000",
   },
 
-  email: {
+  emailAddress: {
     type: String,
     required: true,
-    unique: true,
     lowercase: true,
     match: [
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,

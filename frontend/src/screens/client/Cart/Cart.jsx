@@ -3,10 +3,12 @@ import { Trash2, ShoppingBag, Calendar, Minus, Plus, ChevronLeft, ChevronRight }
 import { imageUrl } from '../../../api/Api';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { useNavigate } from 'react-router-dom';
 
 const CartPage = () => {
   const [cart, setCart] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Helper function to extract price from an item
   const extractPrice = (item) => {
@@ -36,13 +38,13 @@ const CartPage = () => {
             price: extractPrice(item),
             deliveryDate: new Date(item.deliveryDate || Date.now())
           };
-          
+
           // Recalculate total to ensure consistency
           updatedItem.total = updatedItem.price * updatedItem.quantity * updatedItem.days;
-          
+
           return updatedItem;
         });
-        
+
         setCart(cartWithDates);
         setIsLoading(false);
       } catch (error) {
@@ -66,29 +68,29 @@ const CartPage = () => {
 
   const handleQuantityChange = (productId, newQuantity) => {
     if (newQuantity < 1) return;
-    
+
     const updatedCart = cart.map(item => {
       if (item.productId === productId) {
         const updatedQuantity = newQuantity;
         // Make sure price is available and a number
         const price = typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0;
         const updatedTotal = price * updatedQuantity * item.days;
-        return { 
-          ...item, 
-          quantity: updatedQuantity, 
+        return {
+          ...item,
+          quantity: updatedQuantity,
           total: updatedTotal,
           price: price // Ensure price is always stored
         };
       }
       return item;
     });
-    
+
     saveCart(updatedCart);
   };
 
   const handleDaysChange = (productId, newDays) => {
     if (newDays < 1) return;
-    
+
     const updatedCart = cart.map(item => {
       if (item.productId === productId) {
         const updatedDays = newDays;
@@ -96,16 +98,16 @@ const CartPage = () => {
         const price = typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0;
         const updatedTotal = price * item.quantity * updatedDays;
         // Update delivery date based on new days value
-        return { 
-          ...item, 
-          days: updatedDays, 
+        return {
+          ...item,
+          days: updatedDays,
           total: updatedTotal,
           price: price, // Ensure price is always stored
         };
       }
       return item;
     });
-    
+
     saveCart(updatedCart);
   };
 
@@ -119,7 +121,7 @@ const CartPage = () => {
       }
       return item;
     });
-    
+
     saveCart(updatedCart);
   };
 
@@ -146,6 +148,23 @@ const CartPage = () => {
     });
   };
 
+  const handleCheckout = () => {
+    // Get cart data with proper formatting for backend
+    const cartItemsForCheckout = cart.map(item => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      days: item.days,
+      total: item.total,
+      pName: item.pName,
+      detail: item.detail || "",
+      deliveryDate: item.deliveryDate,
+      image: item.image
+    }));
+
+    // Navigate to RentNow with cart data
+    window.location.href = `/rent-now/multi?cart=${encodeURIComponent(JSON.stringify(cartItemsForCheckout))}`;
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -156,11 +175,11 @@ const CartPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header/>
-      
+      <Header />
+
       <div className="max-w-7xl mx-auto px-4 py-8 mb-20">
         <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
-        
+
         {cart.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
             <div className="flex justify-center mb-4">
@@ -168,9 +187,9 @@ const CartPage = () => {
             </div>
             <h2 className="text-2xl font-medium mb-2">Your cart is empty</h2>
             <p className="text-gray-500 mb-6">Looks like you haven't added any items to your cart yet.</p>
-            <button 
+            <button
               className="px-6 py-3 bg-[#FFAD33] text-white font-medium rounded-md hover:bg-[#E89C2C] transition duration-300"
-              onClick={() => window.history.back()}
+              onClick={() => navigate(`/home`)}
             >
               Continue Shopping
             </button>
@@ -184,7 +203,7 @@ const CartPage = () => {
                 <div className="px-6 py-4 border-b border-gray-200">
                   <h2 className="text-xl font-semibold">Cart Items ({cart.length})</h2>
                 </div>
-                
+
                 {/* Cart Items List */}
                 <div className="divide-y divide-gray-200">
                   {cart.map((item) => (
@@ -194,9 +213,9 @@ const CartPage = () => {
                         <div className="sm:w-1/4 mb-4 sm:mb-0">
                           <div className="aspect-square w-full max-w-[150px] mx-auto sm:mx-0 bg-gray-100 rounded-md overflow-hidden">
                             {item.image ? (
-                              <img 
-                                src={`${imageUrl}/${item.image}`} 
-                                alt={item.pName} 
+                              <img
+                                src={`${imageUrl}/${item.image}`}
+                                alt={item.pName}
                                 className="w-full h-full object-cover"
                               />
                             ) : (
@@ -206,12 +225,12 @@ const CartPage = () => {
                             )}
                           </div>
                         </div>
-                        
+
                         {/* Product Details */}
                         <div className="sm:w-3/4 sm:pl-6">
                           <div className="flex justify-between mb-2">
                             <h3 className="text-lg font-medium">{item.pName}</h3>
-                            <button 
+                            <button
                               onClick={() => handleRemoveItem(item.productId)}
                               className="text-gray-400 hover:text-red-500 transition-colors"
                               aria-label="Remove item"
@@ -219,13 +238,13 @@ const CartPage = () => {
                               <Trash2 size={20} />
                             </button>
                           </div>
-                          
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                             {/* Quantity Control */}
                             <div>
                               <label className="text-sm text-gray-500 mb-1 block">Quantity</label>
                               <div className="flex items-center">
-                                <button 
+                                <button
                                   onClick={() => handleQuantityChange(item.productId, item.quantity - 1)}
                                   className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-l-md hover:bg-gray-100"
                                   disabled={item.quantity <= 1}
@@ -239,7 +258,7 @@ const CartPage = () => {
                                   onChange={(e) => handleQuantityChange(item.productId, parseInt(e.target.value) || 1)}
                                   className="h-8 w-12 border-y border-gray-300 focus:outline-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
-                                <button 
+                                <button
                                   onClick={() => handleQuantityChange(item.productId, item.quantity + 1)}
                                   className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-r-md hover:bg-gray-100"
                                 >
@@ -247,12 +266,12 @@ const CartPage = () => {
                                 </button>
                               </div>
                             </div>
-                            
+
                             {/* Rental Days */}
                             <div>
                               <label className="text-sm text-gray-500 mb-1 block">Rental Days</label>
                               <div className="flex items-center">
-                                <button 
+                                <button
                                   onClick={() => handleDaysChange(item.productId, item.days - 1)}
                                   className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-l-md hover:bg-gray-100"
                                   disabled={item.days <= 1}
@@ -266,7 +285,7 @@ const CartPage = () => {
                                   onChange={(e) => handleDaysChange(item.productId, parseInt(e.target.value) || 1)}
                                   className="h-8 w-12 border-y border-gray-300 focus:outline-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
-                                <button 
+                                <button
                                   onClick={() => handleDaysChange(item.productId, (item.days || 1) + 1)}
                                   className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-r-md hover:bg-gray-100"
                                 >
@@ -274,12 +293,12 @@ const CartPage = () => {
                                 </button>
                               </div>
                             </div>
-                            
+
                             {/* Delivery Date */}
                             <div>
                               <label className="text-sm text-gray-500 mb-1 block">Delivery Date</label>
                               <div className="flex items-center">
-                                <button 
+                                <button
                                   onClick={() => handleDateChange(item.productId, -1)}
                                   className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-l-md hover:bg-gray-100"
                                 >
@@ -291,7 +310,7 @@ const CartPage = () => {
                                     {formatDate(item.deliveryDate)}
                                   </span>
                                 </div>
-                                <button 
+                                <button
                                   onClick={() => handleDateChange(item.productId, 1)}
                                   className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-r-md hover:bg-gray-100"
                                 >
@@ -299,7 +318,7 @@ const CartPage = () => {
                                 </button>
                               </div>
                             </div>
-                            
+
                             {/* Item Price */}
                             <div>
                               <label className="text-sm text-gray-500 mb-1 block">Price</label>
@@ -315,12 +334,12 @@ const CartPage = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Order Summary */}
             <div className="lg:w-1/3">
               <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
                 <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
-                
+
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Subtotal</span>
@@ -328,26 +347,29 @@ const CartPage = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Delivery Charges</span>
-                    <span className="font-medium">Rs {(totalQuantity()*200).toFixed(0)}</span>
+                    <span className="font-medium">Rs {(totalQuantity() * 200).toFixed(0)}</span>
                   </div>
                 </div>
-                
+
                 <div className="border-t border-gray-200 pt-4 mb-6">
                   <div className="flex justify-between">
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-lg font-semibold">
-                      Rs {calculateSubtotal() ? (calculateSubtotal() +(totalQuantity()*200)).toFixed(2) : "0.00"}
+                      Rs {calculateSubtotal() ? (calculateSubtotal() + (totalQuantity() * 200)).toFixed(2) : "0.00"}
                     </span>
                   </div>
                 </div>
-                
-                <button className="w-full py-3 bg-[#FFAD33] text-white font-medium rounded-md hover:bg-[#E89C2C] transition duration-300 flex items-center justify-center">
+
+                <button
+                  className="w-full py-3 bg-[#FFAD33] text-white font-medium rounded-md hover:bg-[#E89C2C] transition duration-300 flex items-center justify-center"
+                  onClick={handleCheckout}
+                >
                   Proceed to Checkout
                 </button>
-                
-                <button 
+
+                <button
                   className="w-full py-3 mt-4 border border-[#FFAD33] text-[#FFAD33] font-medium rounded-md hover:bg-[#FFF5E6] transition duration-300 flex items-center justify-center"
-                  onClick={() => window.history.back()}
+                  onClick={() => navigate(`/home`)}
                 >
                   Continue Shopping
                 </button>
@@ -356,8 +378,8 @@ const CartPage = () => {
           </div>
         )}
       </div>
-      
-      <Footer/>
+
+      <Footer />
     </div>
   );
 };

@@ -16,6 +16,10 @@ import Orders from './screens/admin/Orders.jsx';
 import MyOrders from './screens/client/MyOrder/MyOrders.jsx';
 import UserProfile from './screens/client/Profile/Profile.jsx';
 import CartPage from './screens/client/Cart/Cart';
+import RentNowMultiple from './screens/client/RentNow/RentNowMultiple.jsx';
+import Notification from './screens/client/Notification/Notification.jsx';
+import AdminNotification from './screens/admin/AdminNotification.jsx';
+import UserList from './screens/admin/UserList.jsx';
 
 const role = "client"//admin
 
@@ -29,6 +33,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="home" element={<Landing />} />
           <Route path="products" element={<ViewProducts />} />
           <Route path="buyproduct/:id" element={<RentNow />} />
+          <Route path="/rent-now/multi" element={<RentNowMultiple />} />
           <Route path="contact" element={<Contact />} />
           <Route path="product/:productId" element={<ProductDetails />} />
           <Route path="dashboard" element={<Dashboard />} />
@@ -36,9 +41,12 @@ createRoot(document.getElementById('root')).render(
           <Route path="myorders" element={<MyOrders />} />
           <Route path="myprofile" element={<UserProfile />} />
           <Route path="cart" element={<CartPage />} />
+          <Route path="notification" element={<Notification />} />
+          <Route path="adminnotification" element={<AdminNotification />} />
+          <Route path="allusers" element={<UserList />} />
 
         </Route>
       </Routes>
     </Router>
-  </StrictMode>,
+  </StrictMode>
 )

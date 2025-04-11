@@ -13,7 +13,7 @@ const ProductCard = ({ product }) => {
       days: 1,
       total: product.price,
       pName: product.pName,
-      details: product.detail,
+      detail: product.detail,
       deliveryDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
       image: product.image
     };

@@ -22,6 +22,20 @@ const Details = () => {
 
 
 
+  const handleCheckout = () => {
+    const cartItem = [{
+      productId: productData._id,
+      quantity: quantity,
+      days: dayCount * (duration == "days" ? 1 : 30),
+      total: productData.price * quantity * dayCount * (duration == "days" ? 1 : 30),
+      pName: productData.pName,
+      detail: productData.detail,
+      deliveryDate: deliveryDate,
+      image: productData.image
+    }];
+    console.log(cartItem)
+    window.location.href = `/rent-now/multi?cart=${encodeURIComponent(JSON.stringify(cartItem))}`;
+  }
   const handleAddToCart = () => {
     const cartItem = {
       productId: productData._id,
@@ -246,15 +260,8 @@ const Details = () => {
                 disabled={!productData.inStock}
                 className={`w-44 text-white rounded-md  mt-5 py-2 
     ${productData.inStock ? "bg-[#FFAD33] cursor-pointer" : "bg-gray-400 cursor-not-allowed"}`}
-                onClick={() => navigate(`/buyproduct/${productData._id}`, {
-                  state: {
-                    product: productData,
-                    quantity: quantity,
-                    duration: duration, // Could be in days or months
-                    dayCount: dayCount,
-                    deliveryDate: deliveryDate,
-                  }
-                })}
+                onClick={() => handleCheckout()
+                }
               >
                 Rent Now
               </button>

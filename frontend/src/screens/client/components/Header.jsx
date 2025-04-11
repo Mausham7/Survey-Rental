@@ -151,7 +151,7 @@ const Header = () => {
           <NavLink to="/products" className={({ isActive }) => isActive ? "text-[#FFAD33] border-b-2 border-[#FFAD33]" : "hover:text-[#FFAD33]"}>Products</NavLink>
 
           {/* Notification Icon */}
-          <div className="relative cursor-pointer">
+          <div className="relative cursor-pointer" onClick={() => navigate("/notification")}>
             <MdNotifications className="text-2xl hover:text-[#FFAD33]" />
             <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">2</span>
           </div>

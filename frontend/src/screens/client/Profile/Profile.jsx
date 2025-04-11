@@ -56,7 +56,7 @@ const UserProfile = () => {
         product: order.pName,
         rentalDuration: order.days,
         totalPrice: order.total,
-        paymentStatus: order.paymentMethod === "COD" ? "Pending" : "Completed",
+        paymentStatus: order.paymentStatus,
         orderStatus: order.orderStatus,
         deliveryDate: new Date(order.deliveryDate),
         createdAt: new Date(order.createdAt),
@@ -64,7 +64,7 @@ const UserProfile = () => {
         customerDetails: {
           fullName: order.fullName,
           phone: order.phone,
-          email: order.email,
+          email: order.emailAddress,
           address: `${order.streetAddress}, ${order.townCity}`,
         },
       }));
@@ -316,102 +316,7 @@ const UserProfile = () => {
         </div>
       </div>
 
-      <div className="mt-8">
-
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          {/* MyOrders component will be placed here */}
-          <div className="container mx-auto px-4 py-8">
-
-            <h1 className="text-2xl font-bold mb-6">My Orders</h1>
-
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 flex items-center">
-                <AlertCircle className="h-5 w-5 mr-2" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-              </div>
-            ) : orders.length === 0 ? (
-              <p className="text-gray-600">You have no orders yet.</p>
-            ) : (
-              <div className="overflow-x-auto bg-white rounded-lg shadow">
-                <table className="min-w-full divide-y divide-gray-200 text-sm">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left font-semibold text-gray-700">#</th>
-                      <th className="px-6 py-3 text-left font-semibold text-gray-700">Product</th>
-                      <th className="px-6 py-3 text-left font-semibold text-gray-700">Rental (days)</th>
-                      <th className="px-6 py-3 text-left font-semibold text-gray-700">Total Price</th>
-                      <th className="px-6 py-3 text-left font-semibold text-gray-700">Payment</th>
-                      <th className="px-6 py-3 text-left font-semibold text-gray-700">Order Status</th>
-                      <th className="px-6 py-3 text-left font-semibold text-gray-700">Receive Date</th>
-                      <th className="px-6 py-3 text-left font-semibold text-gray-700">Return Date</th>
-                      <th className="px-6 py-3 text-left font-semibold text-gray-700">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {orders.map((order, index) => (
-                      <tr key={order._id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4">{index + 1}</td>
-                        <td className="px-6 py-4">{order.product}</td>
-                        <td className="px-6 py-4">{order.rentalDuration}</td>
-                        <td className="px-6 py-4">Rs. {order.totalPrice}</td>
-                        <td className="px-6 py-4">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.paymentStatus === "Completed"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                            }`}>
-                            {order.paymentStatus}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">{order.orderStatus}</td>
-                        <td className="px-6 py-4">{order.deliveryDate.toDateString()}</td>
-                        <td className="px-6 py-4">{order.returnDate.toDateString()}</td>
-                        <td className="px-6 py-4">
-                          <button
-                            className="text-blue-600 hover:underline"
-                            onClick={() => {
-                              setSelectedOrder(order);
-                              setIsViewModalOpen(true);
-                            }}
-                          >
-                            View
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {isViewModalOpen && selectedOrder && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                <div className="bg-white rounded-lg shadow-lg max-w-xl w-full p-6">
-                  <h2 className="text-xl font-bold mb-4">Order Details</h2>
-                  <p><strong>Order ID:</strong> {selectedOrder._id}</p>
-                  <p><strong>Product:</strong> {selectedOrder.product}</p>
-                  <p><strong>Total Price:</strong> Rs. {selectedOrder.totalPrice}</p>
-                  <p><strong>Rental Duration:</strong> {selectedOrder.rentalDuration} days</p>
-                  <p><strong>Return Date:</strong> {selectedOrder.returnDate.toDateString()}</p>
-                  <p><strong>Payment Status:</strong> {selectedOrder.paymentStatus}</p>
-                  <p><strong>Customer:</strong> {selectedOrder.customerDetails.fullName}</p>
-                  <p><strong>Phone:</strong> {selectedOrder.customerDetails.phone}</p>
-                  <p><strong>Email:</strong> {selectedOrder.customerDetails.email}</p>
-                  <p><strong>Address:</strong> {selectedOrder.customerDetails.address}</p>
-                  <div className="mt-4">
-                    <button className="px-4 py-2 bg-gray-200 rounded" onClick={() => setIsViewModalOpen(false)}>Close</button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      <div className="mt-20"></div>
 
       {/* Footer placeholder */}
       <Footer />

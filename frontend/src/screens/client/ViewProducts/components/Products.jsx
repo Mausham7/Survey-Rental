@@ -6,7 +6,7 @@ import { FaShoppingCart } from "react-icons/fa";
 import ProductCard from "../../components/ProductCard"
 
 
-const FlashSales = () => {
+const Products = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -124,63 +124,8 @@ const FlashSales = () => {
               </select>
             </div>
 
-            {/* Price Sort Filter */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Sort by Price</label>
-              <div className="space-y-2">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="priceSort"
-                    checked={sortByPrice === 'none'}
-                    onChange={() => setSortByPrice('none')}
-                    className="h-4 w-4 text-blue-600"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Default</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="priceSort"
-                    checked={sortByPrice === 'highToLow'}
-                    onChange={() => setSortByPrice('highToLow')}
-                    className="h-4 w-4 text-blue-600"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">High to Low</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="priceSort"
-                    checked={sortByPrice === 'lowToHigh'}
-                    onChange={() => setSortByPrice('lowToHigh')}
-                    className="h-4 w-4 text-blue-600"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Low to High</span>
-                </label>
-              </div>
-            </div>
-
-            {/* Price Range Filter */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Price Range (Rs/Day)</label>
-              <div className="space-y-2">
-                <input
-                  type="number"
-                  placeholder="Min"
-                  value={priceRange.min}
-                  onChange={handlePriceMinChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-                <input
-                  type="number"
-                  placeholder="Max"
-                  value={priceRange.max}
-                  onChange={handlePriceMaxChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
+            
+            
 
             {/* Stock Filter */}
             <div className="mb-2">
@@ -220,4 +165,4 @@ const FlashSales = () => {
   );
 };
 
-export default FlashSales;
+export default Products;

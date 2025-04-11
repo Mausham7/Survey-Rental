@@ -1,13 +1,13 @@
 import React from 'react'
 import Header from '../components/Header'
-import FlashSales from './components/FlashSales'
+import Products from './components/Products'
 import Footer from '../components/Footer'
 
 const ViewProducts = () => {
   return (
     <>
       <Header />
-      <FlashSales />
+      <Products />
       <Footer/>
     </>
   )

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AlertCircle } from 'lucide-react';
 
 import Data from '../components/UserDataCard';
-import { get_my_orders } from '../../../api/Api';
+import { get_my_orders, update_order } from '../../../api/Api';
 import Header from '../components/Header';
 
 const MyOrders = () => {
@@ -11,6 +11,29 @@ const MyOrders = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const updateStatus = async (orderId, newStatus = "cancelled") => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(update_order, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ orderId, orderStatus: newStatus })
+      });
+
+      if (response.ok) {
+        fetchMyOrders(); // Refresh orders
+        console.log("Order status updated");
+      } else {
+        console.error('Failed to update order status');
+      }
+    } catch (error) {
+      console.error('Error updating order:', error);
+    }
+  };
 
   useEffect(() => {
     fetchMyOrders();
@@ -38,15 +61,15 @@ const MyOrders = () => {
         product: order.pName,
         rentalDuration: order.days,
         totalPrice: order.total,
-        paymentStatus: order.paymentMethod === "COD" ? "Pending" : "Completed",
+        paymentStatus: order.paymentStatus,
         orderStatus: order.orderStatus,
-        deliveryDate:new Date(order.deliveryDate),
+        deliveryDate: new Date(order.deliveryDate),
         createdAt: new Date(order.createdAt),
         returnDate: new Date(new Date(order.deliveryDate).getTime() + (order.days * 24 * 60 * 60 * 1000)),
         customerDetails: {
           fullName: order.fullName,
           phone: order.phone,
-          email: order.email,
+          email: order.emailAddress,
           address: `${order.streetAddress}, ${order.townCity}`,
         },
       }));
@@ -61,7 +84,7 @@ const MyOrders = () => {
 
   return (
     <div className='h-[101vh]'>
-      <Header/>
+      <Header />
       <div className="container mx-auto px-4 py-8">
         <Data data={orders.length} />
         <h1 className="text-2xl font-bold mb-6">My Orders</h1>
@@ -103,18 +126,17 @@ const MyOrders = () => {
                     <td className="px-6 py-4">{order.rentalDuration}</td>
                     <td className="px-6 py-4">Rs. {order.totalPrice}</td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        order.paymentStatus === "Completed"
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.paymentStatus === "paid"
                           ? "bg-green-100 text-green-700"
                           : "bg-yellow-100 text-yellow-700"
-                      }`}>
+                        }`}>
                         {order.paymentStatus}
                       </span>
                     </td>
                     <td className="px-6 py-4">{order.orderStatus}</td>
                     <td className="px-6 py-4">{order.deliveryDate.toDateString()}</td>
                     <td className="px-6 py-4">{order.returnDate.toDateString()}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 space-x-2">
                       <button
                         className="text-blue-600 hover:underline"
                         onClick={() => {
@@ -124,6 +146,14 @@ const MyOrders = () => {
                       >
                         View
                       </button>
+                      {order.orderStatus == 'processing' && (
+                        <button
+                          className="text-red-600 hover:underline"
+                          onClick={() => updateStatus(order._id)}
+                        >
+                          Cancel
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -146,8 +176,24 @@ const MyOrders = () => {
               <p><strong>Phone:</strong> {selectedOrder.customerDetails.phone}</p>
               <p><strong>Email:</strong> {selectedOrder.customerDetails.email}</p>
               <p><strong>Address:</strong> {selectedOrder.customerDetails.address}</p>
-              <div className="mt-4">
-                <button className="px-4 py-2 bg-gray-200 rounded" onClick={() => setIsViewModalOpen(false)}>Close</button>
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded"
+                  onClick={() => setIsViewModalOpen(false)}
+                >
+                  Close
+                </button>
+                {selectedOrder.orderStatus == 'processing' && (
+                  <button
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded"
+                    onClick={() => {
+                      updateStatus(selectedOrder._id);
+                      setIsViewModalOpen(false);
+                    }}
+                  >
+                    Cancel Order
+                  </button>
+                )}
               </div>
             </div>
           </div>

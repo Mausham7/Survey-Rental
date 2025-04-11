@@ -8,6 +8,8 @@ const SignUp = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -17,8 +19,8 @@ const SignUp = () => {
     navigate("/");
   };
 
-const handleSignUp = async () => {
-    if (!email || !password || !phone || !fullName) {
+  const handleSignUp = async () => {
+    if (!email || !password || !phone || !firstName || !lastName) {
       setError("*All fields are required.");
       return;
     }
@@ -27,7 +29,7 @@ const handleSignUp = async () => {
       setError('*Please enter a valid Phone Number.');
       return false;
     }
-  
+
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
       setError('*Please enter a valid email address.');
@@ -40,11 +42,12 @@ const handleSignUp = async () => {
       const response = await fetch(manual_register, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, fullName, phone, role : "customer" }),
+        body: JSON.stringify({ email, password, fullName: firstName + " " + lastName, phone, role: "customer" }),
       });
       const data = await response.json();
       if (response.ok) {
         setIsLoading(false);
+        alert("Account Created successfully!")
         navigate("/");
       } else {
         setIsLoading(false);
@@ -76,13 +79,20 @@ const handleSignUp = async () => {
         </h1>
         {/* <h3>Enter your details below</h3> */}
         <div className="flex flex-col gap-10  ">
-        {error && <div className="w-full text-red-400 text-sm">{error}</div>}
+          {error && <div className="w-full text-red-400 text-sm">{error}</div>}
 
           <input
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             type="text"
-            placeholder="Name"
+            placeholder="First Name"
+            className="border-b-2 h-10 outline-none"
+          />
+          <input
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            type="text"
+            placeholder="Last Name"
             className="border-b-2 h-10 outline-none"
           />
           <input

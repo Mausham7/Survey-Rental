@@ -92,6 +92,8 @@ const RentNow = () => {
     }
   };
 
+  
+
 
   // Fetch product details when component mounts
   useEffect(() => {

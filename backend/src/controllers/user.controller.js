@@ -17,7 +17,7 @@ export const getProfile = asyncHandler(async (req, res) => {
 
 export const updateProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
-  console.log("body: ",req.body)
+  console.log("body: ", req.body);
 
   if (!user) {
     res.status(404);
@@ -37,7 +37,6 @@ export const updateProfile = asyncHandler(async (req, res) => {
     throw new Error("Role cannot be changed");
   }
 
-
   // Update basic fields
   if (fullName) user.fullName = fullName;
   if (phone) user.phone = phone;
@@ -53,13 +52,12 @@ export const updateProfile = asyncHandler(async (req, res) => {
     // Hash the new password
     user.password = await bcrypt.hash(newPassword, 12);
 
-    console.log(user)
-    
+    console.log(user);
   }
 
   // Save the updated user
   const updatedUser = await user.save();
-  console.log(updatedUser)
+  console.log(updatedUser);
 
   res.status(200).json({
     success: true,
@@ -74,3 +72,13 @@ export const updateProfile = asyncHandler(async (req, res) => {
     message: "Profile updated successfully",
   });
 });
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).sort({ createdAt: -1 });
+    res.json(users);
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
