@@ -147,7 +147,7 @@ const Details = () => {
     <div className='mb-20'>
       <div className='hidden showCarousel:flex  h-[31.25rem]  w-[75.6875rem] mx-auto mt-4 gap-8'>
         <img
-          src={`${imageUrl}/${productData.image}`}
+          src={`http://localhost:4000/uploads/${productData.image}`}
           alt={`image`}
           className='h-[31.25rem] w-[550px]'
         />

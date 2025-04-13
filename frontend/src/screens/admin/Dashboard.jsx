@@ -58,46 +58,55 @@ const Dashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
+  
     const formDataToSend = new FormData();
-    formDataToSend.append('pName', formData.pName);
-    formDataToSend.append('category', formData.category);
-    formDataToSend.append('price', formData.price);
-    formDataToSend.append('inStock', formData.inStock);
-    formDataToSend.append('detail', formData.detail);
-    formDataToSend.append('image', formData.image);
-
+  
+    formDataToSend.append("pName", formData.pName);
+    formDataToSend.append("category", formData.category);
+    formDataToSend.append("price", formData.price);
+    // Convert the boolean or any value to a number
+    formDataToSend.append("stock", formData.inStock ? 1 : 0);
+    formDataToSend.append("detail", formData.detail);
+  
+    if (formData.image) {
+      formDataToSend.append("image", formData.image, formData.image.name);
+    } else {
+      console.warn("No image file selected.");
+    }
+  
     try {
       const response = await fetch(add_product, {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
         body: formDataToSend,
       });
-
+  
       if (response.ok) {
-        alert('Product added successfully!');
+        alert("Product added successfully!");
         setShowPopup(false);
-        setFormData(
-          {
-            pName: '',
-            category: '',
-            price: 0,
-            stock: 0,
-            inStock: true,
-            image: null,
-            detail: '',
-          }
-        )
+        setFormData({
+          pName: "",
+          category: "",
+          price: 0,
+          stock: 0,
+          inStock: true,
+          image: null,
+          detail: "",
+        });
         fetchProducts();
       } else {
-        alert('Error adding product');
+        alert("Error adding product");
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
+  
+  
+  
 
   const toggleProductStatus = async (productId, currentStatus) => {
     try {
@@ -281,6 +290,10 @@ const Dashboard = () => {
                 <option value='Theodolites'>Theodolites</option>
                 <option value='Prisms'>Prisms</option>
                 <option value='Drone'>Drone</option>
+                <option value='GNSS'>GNSS</option>
+                <option value='Tripod'>Tripod</option>
+                <option value='Survey Staff'>Survey Staff</option>
+                <option value='Prisms stand'>Prisms stand</option>
               </select>
               <textarea name='detail' placeholder='Detail' value={formData.detail} onChange={handleInputChange} required className='block w-full p-3 border rounded-lg h-32' />
               <input type='text' name='price' placeholder='Price' value={formData.price} onChange={handleInputChange} required className='block w-full p-3 border rounded-lg' />

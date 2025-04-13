@@ -116,7 +116,7 @@ const FilterButton = () => {
         {products.length === 0 ? (
           <p className="text-center text-gray-500">No products available.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 px-28">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-28">
             {products.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}

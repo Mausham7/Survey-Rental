@@ -17,6 +17,7 @@ const createJwtToken = (user) => {
   );
 };
 
+
 // Manual email-password login
 export const manualLogin = async (req, res) => {
   const { email, password } = req.body;
@@ -64,7 +65,7 @@ export const register = async (req, res) => {
     await sendEmail({
       email: email,
       subject: "Congratulations your account has been created!",
-      message: "Dear customer, we to survey rental",
+      message: "Dear customer, welcome to survey rental",
     });
     res.status(201).json({ token: jwtToken, user });
   } catch (error) {

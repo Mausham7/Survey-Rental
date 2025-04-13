@@ -124,10 +124,10 @@ const Products = () => {
               </select>
             </div>
 
-            
+      
             
 
-            {/* Stock Filter */}
+            Stock Filter
             <div className="mb-2">
               <label className="flex items-center cursor-pointer">
                 <input

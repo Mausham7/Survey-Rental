@@ -26,7 +26,7 @@ import { getAllUsers, getProfile, updateProfile } from "../controllers/user.cont
 import { handleKhaltiCallback } from "../controllers/khalti.controller.js";
 import { getNotifications } from "../controllers/notification.controller.js";
 
-const router = Router();
+const router = Router(); //express ko routing garne package ho 
 
 // non secure routes
 router.route("/auth/login").post(manualLogin);

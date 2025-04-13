@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
+  console.log("prodcut", product);
 
   const handleAddToCart = () => {
     const cartItem = {
@@ -43,11 +44,12 @@ const ProductCard = ({ product }) => {
       key={product._id}
       className="h-[25rem] shadow-md flex flex-col border border-gray-200 rounded-xl mb-2 transition-all hover:shadow-lg"
     >
-      <img
-        src={`http://localhost:4000/${product.image}`}
-        alt={`${product.pName} image`}
-        className="rounded-t-xl h-[10rem] w-full object-cover"
-      />
+    <img
+  src={`http://localhost:4000/uploads/${product.image}`}
+  alt={`${product.pName} image`}
+  className="rounded-t-xl h-[10rem] w-full object-containt"
+/>
+
       <div className="w-full px-3 flex flex-col justify-evenly flex-1">
         <h2 className="font-medium text-lg truncate">{product.pName}</h2>
         <h3 className="text-gray-600 text-sm line-clamp-2">{product.detail}</h3>
@@ -75,7 +77,7 @@ const ProductCard = ({ product }) => {
               <FaShoppingCart className="text-[#FFAD33] group-hover:scale-110 transition-transform" />
             </button>
             <button
-              className="bg-[#FFAD33] px-3 py-1.5 text-white rounded-lg hover:bg-amber-500 transition-all duration-300 hover:shadow-md transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-none"
+              className="bg-[#FFAD33] px-4  py-1.5 text-white rounded-lg hover:bg-amber-500 transition-all duration-300 hover:shadow-md transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-none"
               onClick={() => navigate(`/product/${product._id}`)}
               disabled={product.stock <= 0}
             >
