@@ -15,21 +15,25 @@ const userSchema = new mongoose.Schema({
       "Please add a valid email",
     ],
   },
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  emailVerificationToken: {
+    type: String,
+  },
   password: {
     type: String,
   },
-
   phone: {
     type: String,
     default: "+977 9800000000",
   },
-
   role: {
     type: String,
     enum: ["admin", "customer"],
     default: "client",
   },
-
   createdAt: {
     type: Date,
     default: Date.now,

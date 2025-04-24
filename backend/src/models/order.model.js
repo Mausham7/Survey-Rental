@@ -11,23 +11,20 @@ const orderSchema = new mongoose.Schema({
     ref: "Product",
     required: true,
   },
-
   paymentMethod: {
     type: String,
     default: "COD",
   },
   orderStatus: {
     type: String,
-    default: "processing",
     enum: ["processing", "shipped", "delivered", "completed", "cancelled"],
+    default: "processing",
   },
   paymentStatus: {
     type: String,
-    default: "pending",
     enum: ["pending", "paid"],
-    default:"pending"
+    default: "pending",
   },
-
   fullName: {
     type: String,
     required: true,
@@ -36,7 +33,6 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-
   streetAddress: {
     type: String,
     required: true,
@@ -44,7 +40,6 @@ const orderSchema = new mongoose.Schema({
   coordinates: {
     type: String,
   },
-
   townCity: {
     type: String,
     required: true,
@@ -57,7 +52,6 @@ const orderSchema = new mongoose.Schema({
     type: String,
     default: "+977 9800000000",
   },
-
   emailAddress: {
     type: String,
     required: true,
@@ -67,12 +61,10 @@ const orderSchema = new mongoose.Schema({
       "Please add a valid email",
     ],
   },
-
   quantity: {
     type: Number,
     default: 1,
   },
-
   days: {
     type: Number,
     default: 1,
@@ -81,12 +73,10 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-
   image: {
     type: String,
     required: true,
   },
-
   pName: {
     type: String,
     required: true,
@@ -95,7 +85,6 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-
   createdAt: {
     type: Date,
     default: Date.now,

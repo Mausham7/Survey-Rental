@@ -39,7 +39,7 @@ const FlashSales = () => {
     <div className="p-10">
       <h1 className="font-bold text-4xl text-center mt-6 mb-6 hidden md:block">Flash Sales</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 px-28 ">
-        {products.slice(0, 6).map((product) => (
+        {products.slice(0, 5).map((product) => (
           <ProductCard key={product._id} product={product} />
         ))}
       </div>

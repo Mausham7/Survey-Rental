@@ -1,140 +1,145 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, ShoppingBag, Calendar, Minus, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
-import { imageUrl } from '../../../api/Api';
+import { useNavigate } from 'react-router-dom';
+// import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { useNavigate } from 'react-router-dom';
+import { get_cart, imageUrl, remove_from_cart, update_cart_item } from '../../../api/Api';
 
 const CartPage = () => {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState({ items: [] });
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Helper function to extract price from an item
-  const extractPrice = (item) => {
-    if (typeof item.price === 'number' && item.price > 0) return item.price;
-    // If we have total, days and quantity, we can calculate price
-    if (item.total && item.days > 0 && item.quantity > 0) {
-      return item.total / (item.days * item.quantity);
-    }
-    // If we only have total, assume 1 day and 1 quantity
-    if (item.total) return item.total;
-    // Default price
-    return 0;
-  };
-
   useEffect(() => {
-    // Load cart data from localStorage
-    const loadCart = () => {
-      try {
-        const savedCart = JSON.parse(localStorage.getItem('cart')) || [];
-        // Convert deliveryDate strings back to Date objects and ensure price property exists
-        const cartWithDates = savedCart.map(item => {
-          // Make sure we have all required properties with fallbacks
-          const updatedItem = {
-            ...item,
-            quantity: item.quantity || 1,
-            days: item.days || 1,
-            price: extractPrice(item),
-            deliveryDate: new Date(item.deliveryDate || Date.now())
-          };
-
-          // Recalculate total to ensure consistency
-          updatedItem.total = updatedItem.price * updatedItem.quantity * updatedItem.days;
-
-          return updatedItem;
-        });
-
-        setCart(cartWithDates);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error loading cart:', error);
-        setIsLoading(false);
-      }
-    };
-
     loadCart();
   }, []);
 
-  const saveCart = (updatedCart) => {
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-    setCart(updatedCart);
+  const token = localStorage.getItem('token');
+
+  const loadCart = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(get_cart, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setCart(data.data);
+      }
+    } catch (error) {
+      console.error('Error loading cart:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleRemoveItem = (productId) => {
-    const updatedCart = cart.filter(item => item.productId !== productId);
-    saveCart(updatedCart);
+  const handleRemoveItem = async (productId) => {
+    try {
+      setIsLoading(true);
+      await fetch(remove_from_cart(productId), {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      loadCart();
+    } catch (error) {
+      console.error('Error removing item:', error);
+      alert('Failed to remove item from cart');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleQuantityChange = (productId, newQuantity) => {
+  const handleQuantityChange = async (productId, newQuantity) => {
     if (newQuantity < 1) return;
 
-    const updatedCart = cart.map(item => {
-      if (item.productId === productId) {
-        const updatedQuantity = newQuantity;
-        // Make sure price is available and a number
-        const price = typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0;
-        const updatedTotal = price * updatedQuantity * item.days;
-        return {
-          ...item,
-          quantity: updatedQuantity,
-          total: updatedTotal,
-          price: price // Ensure price is always stored
-        };
-      }
-      return item;
-    });
+    try {
+      setIsLoading(true);
+      await fetch(update_cart_item(productId), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ quantity: newQuantity })
+      });
 
-    saveCart(updatedCart);
+      loadCart();
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+      alert('Failed to update quantity');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDaysChange = (productId, newDays) => {
+  const handleDaysChange = async (productId, newDays) => {
     if (newDays < 1) return;
 
-    const updatedCart = cart.map(item => {
-      if (item.productId === productId) {
-        const updatedDays = newDays;
-        // Make sure price is available and a number
-        const price = typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0;
-        const updatedTotal = price * item.quantity * updatedDays;
-        // Update delivery date based on new days value
-        return {
-          ...item,
-          days: updatedDays,
-          total: updatedTotal,
-          price: price, // Ensure price is always stored
-        };
-      }
-      return item;
-    });
+    try {
+      setIsLoading(true);
+      await fetch(update_cart_item(productId), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ days: newDays })
+      });
 
-    saveCart(updatedCart);
+      loadCart();
+    } catch (error) {
+      console.error('Error updating days:', error);
+      alert('Failed to update rental days');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDateChange = (productId, daysToAdd) => {
-    const updatedCart = cart.map(item => {
-      if (item.productId === productId) {
-        const currentDate = new Date(item.deliveryDate);
-        const newDate = new Date(currentDate);
-        newDate.setDate(newDate.getDate() + daysToAdd);
-        return { ...item, deliveryDate: newDate };
-      }
-      return item;
-    });
+  const handleDateChange = async (productId, daysToAdd) => {
+    try {
+      setIsLoading(true);
 
-    saveCart(updatedCart);
+      const currentItem = cart.items.find(item => item.productId === productId);
+      const currentDate = new Date(currentItem.deliveryDate);
+      const newDate = new Date(currentDate);
+      newDate.setDate(currentDate.getDate() + daysToAdd);
+
+      await fetch(update_cart_item(productId), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ deliveryDate: newDate })
+      });
+
+      loadCart();
+    } catch (error) {
+      console.error('Error updating date:', error);
+      alert('Failed to update delivery date');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const calculateSubtotal = () => {
-    return cart.reduce((sum, item) => {
-      // Handle potential null or undefined values
+    return (cart.items || []).reduce((sum, item) => {
       const itemTotal = item.total || 0;
       return sum + itemTotal;
     }, 0);
   };
+
   const totalQuantity = () => {
-    return cart.reduce((sum, item) => {
-      // Handle potential null or undefined values
+    return (cart.items || []).reduce((sum, item) => {
       const quantityTotal = item.quantity || 0;
       return sum + quantityTotal;
     }, 0);
@@ -150,7 +155,7 @@ const CartPage = () => {
 
   const handleCheckout = () => {
     // Get cart data with proper formatting for backend
-    const cartItemsForCheckout = cart.map(item => ({
+    const cartItemsForCheckout = (cart.items || []).map(item => ({
       productId: item.productId,
       quantity: item.quantity,
       days: item.days,
@@ -161,7 +166,7 @@ const CartPage = () => {
       image: item.image
     }));
 
-    // Navigate to RentNow with cart data
+    // Navigate to checkout
     window.location.href = `/rent-now/multi?cart=${encodeURIComponent(JSON.stringify(cartItemsForCheckout))}`;
   };
 
@@ -180,7 +185,7 @@ const CartPage = () => {
       <div className="max-w-7xl mx-auto px-4 py-8 mb-20">
         <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
 
-        {cart.length === 0 ? (
+        {(cart.items || []).length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
             <div className="flex justify-center mb-4">
               <ShoppingBag size={64} className="text-gray-300" />
@@ -201,12 +206,12 @@ const CartPage = () => {
               <div className="bg-white rounded-lg shadow-md">
                 {/* Cart Header */}
                 <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-xl font-semibold">Cart Items ({cart.length})</h2>
+                  <h2 className="text-xl font-semibold">Cart Items ({cart.items.length})</h2>
                 </div>
 
                 {/* Cart Items List */}
                 <div className="divide-y divide-gray-200">
-                  {cart.map((item) => (
+                  {cart.items.map((item) => (
                     <div key={item.productId} className="p-6">
                       <div className="flex flex-col sm:flex-row">
                         {/* Product Image */}

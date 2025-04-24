@@ -2,15 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { AlertCircle } from 'lucide-react';
 
 import Data from '../components/UserDataCard';
-import { get_my_orders, update_order } from '../../../api/Api';
+import { extend_order, get_my_orders, update_order } from '../../../api/Api';
 import Header from '../components/Header';
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
+  const [extendDays, setExtendDays] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
+
+
+
+  const khaltiCall = (data) => {
+    window.location.href = data.payment_url;
+  };
+
+  // Daily rental rate (simplified - in a real app, this would come from the product data)
+  const getDailyRate = (totalPrice, days) => totalPrice / days;
 
   const updateStatus = async (orderId, newStatus = "cancelled") => {
     try {
@@ -32,6 +44,56 @@ const MyOrders = () => {
       }
     } catch (error) {
       console.error('Error updating order:', error);
+    }
+  };
+
+  const extendRental = async (orderId, additionalDays) => {
+    try {
+      setPaymentProcessing(true);
+      const token = localStorage.getItem('token');
+
+      // In a real implementation, you would handle payment processing here
+      // This is a simplified version
+      const order = orders.find(o => o._id === orderId);
+      const dailyRate = getDailyRate(order.totalPrice, order.rentalDuration);
+      const additionalCost = dailyRate * additionalDays;
+
+      // Mock a payment process
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // After payment is successful, update the order with extended duration
+      const response = await fetch(extend_order, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          orderId,
+          extendDays: additionalDays,
+          additionalAmount: additionalCost
+        })
+      });
+
+      if (response.ok) {
+        setIsExtendModalOpen(false);
+        fetchMyOrders(); // Refresh orders
+        // console.log("Rental period extended successfully");
+
+        const responseData = await response.json();
+        console.log(responseData)
+        if (responseData.payment_method === "khalti") {
+          khaltiCall(responseData.data);
+        }
+      } else {
+        console.error('Failed to extend rental period');
+        setError('Failed to extend rental period. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error extending rental:', error);
+      setError('Error processing your request. Please try again.');
+    } finally {
+      setPaymentProcessing(false);
     }
   };
 
@@ -82,6 +144,11 @@ const MyOrders = () => {
     }
   };
 
+  // Determine if an order is eligible for extension
+  const canExtendRental = (order) => {
+    return order.orderStatus !== 'completed' && order.orderStatus !== 'cancelled';
+  };
+
   return (
     <div className='h-[101vh]'>
       <Header />
@@ -127,8 +194,8 @@ const MyOrders = () => {
                     <td className="px-6 py-4">Rs. {order.totalPrice}</td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.paymentStatus === "paid"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
                         }`}>
                         {order.paymentStatus}
                       </span>
@@ -146,12 +213,24 @@ const MyOrders = () => {
                       >
                         View
                       </button>
-                      {order.orderStatus == 'processing' && (
+                      {order.orderStatus === 'processing' && (
                         <button
                           className="text-red-600 hover:underline"
                           onClick={() => updateStatus(order._id)}
                         >
                           Cancel
+                        </button>
+                      )}
+                      {canExtendRental(order) && (
+                        <button
+                          className="text-green-600 hover:underline"
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setExtendDays(1);
+                            setIsExtendModalOpen(true);
+                          }}
+                        >
+                          Extend
                         </button>
                       )}
                     </td>
@@ -162,6 +241,7 @@ const MyOrders = () => {
           </div>
         )}
 
+        {/* View Order Modal */}
         {isViewModalOpen && selectedOrder && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg shadow-lg max-w-xl w-full p-6">
@@ -183,7 +263,7 @@ const MyOrders = () => {
                 >
                   Close
                 </button>
-                {selectedOrder.orderStatus == 'processing' && (
+                {selectedOrder.orderStatus === 'processing' && (
                   <button
                     className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded"
                     onClick={() => {
@@ -194,6 +274,85 @@ const MyOrders = () => {
                     Cancel Order
                   </button>
                 )}
+                {canExtendRental(selectedOrder) && (
+                  <button
+                    className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
+                    onClick={() => {
+                      setIsViewModalOpen(false);
+                      setExtendDays(1);
+                      setIsExtendModalOpen(true);
+                    }}
+                  >
+                    Extend Rental
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Extend Rental Modal */}
+        {isExtendModalOpen && selectedOrder && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+              <h2 className="text-xl font-bold mb-4">Extend Rental Period</h2>
+              <p><strong>Product:</strong> {selectedOrder.product}</p>
+              <p><strong>Current Rental:</strong> {selectedOrder.rentalDuration} days</p>
+              <p><strong>Current Return Date:</strong> {selectedOrder.returnDate.toDateString()}</p>
+
+              <div className="my-4">
+                <label className="block text-gray-700 mb-2">Additional Days:</label>
+                <div className="flex items-center">
+                  <button
+                    className="px-3 py-1 bg-gray-200 rounded-l hover:bg-gray-300 disabled:opacity-50"
+                    onClick={() => setExtendDays(Math.max(1, extendDays - 1))}
+                    disabled={extendDays <= 1}
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    className="w-20 text-center border-y border-gray-300 py-1"
+                    value={extendDays}
+                    onChange={(e) => setExtendDays(Math.max(1, parseInt(e.target.value) || 1))}
+                    min="1"
+                  />
+                  <button
+                    className="px-3 py-1 bg-gray-200 rounded-r hover:bg-gray-300"
+                    onClick={() => setExtendDays(extendDays + 1)}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                <p><strong>New Return Date:</strong> {new Date(selectedOrder.returnDate.getTime() + (extendDays * 24 * 60 * 60 * 1000)).toDateString()}</p>
+                <p><strong>Additional Cost:</strong> Rs. {(getDailyRate(selectedOrder.totalPrice, selectedOrder.rentalDuration) * extendDays).toFixed(2)}</p>
+              </div>
+
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded"
+                  onClick={() => setIsExtendModalOpen(false)}
+                  disabled={paymentProcessing}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded flex items-center justify-center disabled:opacity-70"
+                  onClick={() => extendRental(selectedOrder._id, extendDays)}
+                  disabled={paymentProcessing}
+                >
+                  {paymentProcessing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    'Pay & Extend'
+                  )}
+                </button>
               </div>
             </div>
           </div>

@@ -3,30 +3,36 @@ import { CiSearch } from "react-icons/ci";
 import { MdLogout, MdNotifications } from "react-icons/md";
 import { IoMenu } from "react-icons/io5";
 import { RxCross1 } from "react-icons/rx";
-import { FaUser, FaShoppingCart, FaChevronDown, FaFirstOrder } from "react-icons/fa";
+import { FaUser, FaShoppingCart, FaChevronDown } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { getAllProducts } from "../../../api/Api";
-import { GrOrderedList } from "react-icons/gr";
+import { cart_count, getAllProducts, notification_count, notification_markseen } from "../../../api/Api";
 import { BsBucket } from "react-icons/bs";
-import { Contact, ContactIcon } from "lucide-react";
+import { ContactIcon } from "lucide-react";
 
 const Header = () => {
   const navigate = useNavigate();
   const [isMenuClicked, setIsMenuClicked] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [cartCount, setCartCount] = useState("");
+  const [cartCount, setCartCount] = useState(0);
+  const [notificationCount, setNotificationCount] = useState(0);
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [showBlur, setShowBlur] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const profileDropdownRef = useRef(null);
 
-
   useEffect(() => {
     fetchProducts();
-    const savedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    setCartCount(savedCart.length)
+    fetchNotifications();
+    fetchCartCount();
+
+    // Set up interval to periodically check for updates
+    const intervalId = setInterval(() => {
+      fetchCartCount();
+      fetchNotifications();
+      console.log("refresh")
+    }, 6000); // Check every minute
 
     // Add event listener to close dropdown when clicking outside
     const handleClickOutside = (event) => {
@@ -36,10 +42,76 @@ const Header = () => {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      clearInterval(intervalId);
     };
   }, []);
+
+  // Fetch cart count from server
+  const fetchCartCount = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch(cart_count, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // console.log("cart data: ", data)
+        setCartCount(data.count || 0);
+      }
+    } catch (error) {
+      console.error("Error fetching cart count:", error);
+    }
+  };
+  const notificationMarkSeen = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch(notification_markseen, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("markseen : ", data)
+        setNotificationCount(0);
+      }
+    } catch (error) {
+      console.error("Error fetching cart count:", error);
+    }
+  };
+
+  // Fetch user notifications from backend
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch(notification_count, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // console.log("notification data: ", data)
+        setNotificationCount(data.count || 0);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
 
   useEffect(() => {
     setShowBlur(!!searchTerm);
@@ -151,20 +223,25 @@ const Header = () => {
           <NavLink to="/products" className={({ isActive }) => isActive ? "text-[#FFAD33] border-b-2 border-[#FFAD33]" : "hover:text-[#FFAD33]"}>Products</NavLink>
 
           {/* Notification Icon */}
-          <div className="relative cursor-pointer" onClick={() => navigate("/notification")}>
+          <div
+            className="relative cursor-pointer"
+            onClick={() => {
+              notificationMarkSeen();
+              navigate("/notification");
+            }}
+          >
             <MdNotifications className="text-2xl hover:text-[#FFAD33]" />
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">2</span>
+            {notificationCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">{notificationCount}</span>
+            )}
           </div>
 
           {/* Cart Icon */}
           <div className="relative cursor-pointer" onClick={() => navigate("/cart")}>
             <FaShoppingCart className="text-xl hover:text-[#FFAD33]" />
             {cartCount > 0 && (
-
               <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">{cartCount}</span>
-            )
-
-            }
+            )}
           </div>
 
           {/* Profile Menu */}
@@ -197,7 +274,6 @@ const Header = () => {
                   }}
                 >
                   <BsBucket className="text-gray-500" />
-
                   My Orders
                 </div>
                 <div
@@ -208,12 +284,13 @@ const Header = () => {
                   }}
                 >
                   <ContactIcon className="text-gray-500" />
-
                   Contact
                 </div>
                 <div
                   className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center gap-2 border-t"
                   onClick={() => {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("userId");
                     navigate("/");
                     setShowProfileDropdown(false);
                   }}
@@ -230,70 +307,81 @@ const Header = () => {
         <div className="md:hidden">
           <IoMenu className="text-2xl cursor-pointer" onClick={() => setIsMenuClicked(true)} />
         </div>
-      </nav>
+      </nav >
 
       {/* Mobile Menu - Only visible on small screens */}
-      {isMenuClicked && (
-        <div className="fixed inset-0 bg-white z-50 p-4 md:hidden">
-          <div className="flex justify-end">
-            <RxCross1 className="text-2xl cursor-pointer" onClick={() => setIsMenuClicked(false)} />
-          </div>
-          <div className="flex flex-col gap-4 mt-8">
-            <NavLink
-              to="/home"
-              className={({ isActive }) => isActive ? "text-[#FFAD33] font-semibold" : ""}
-              onClick={() => setIsMenuClicked(false)}
-            >
-              Home
-            </NavLink>
-            <NavLink
-              to="/products"
-              className={({ isActive }) => isActive ? "text-[#FFAD33] font-semibold" : ""}
-              onClick={() => setIsMenuClicked(false)}
-            >
-              Products
-            </NavLink>
-            <NavLink
-              to="/myorders"
-              className={({ isActive }) => isActive ? "text-[#FFAD33] font-semibold" : ""}
-              onClick={() => setIsMenuClicked(false)}
-            >
-              My Orders
-            </NavLink>
-            <NavLink
-              to="/myprofile"
-              className={({ isActive }) => isActive ? "text-[#FFAD33] font-semibold" : ""}
-              onClick={() => setIsMenuClicked(false)}
-            >
-              My Profile
-            </NavLink>
-            <NavLink
-              to="/contact"
-              className={({ isActive }) => isActive ? "text-[#FFAD33] font-semibold" : ""}
-              onClick={() => setIsMenuClicked(false)}
-            >
-              Contact
-            </NavLink>
-            <NavLink
-              to="/cart"
-              className={({ isActive }) => isActive ? "text-[#FFAD33] font-semibold" : ""}
-              onClick={() => setIsMenuClicked(false)}
-            >
-              Cart
-            </NavLink>
-            <div
-              className="flex items-center gap-2 cursor-pointer"
-              onClick={() => {
-                navigate("/");
-                setIsMenuClicked(false);
-              }}
-            >
-              <MdLogout className="text-xl" />
-              Logout
+      {
+        isMenuClicked && (
+          <div className="fixed inset-0 bg-white z-50 p-4 md:hidden">
+            <div className="flex justify-end">
+              <RxCross1 className="text-2xl cursor-pointer" onClick={() => setIsMenuClicked(false)} />
+            </div>
+            <div className="flex flex-col gap-4 mt-8">
+              <NavLink
+                to="/home"
+                className={({ isActive }) => isActive ? "text-[#FFAD33] font-semibold" : ""}
+                onClick={() => setIsMenuClicked(false)}
+              >
+                Home
+              </NavLink>
+              <NavLink
+                to="/products"
+                className={({ isActive }) => isActive ? "text-[#FFAD33] font-semibold" : ""}
+                onClick={() => setIsMenuClicked(false)}
+              >
+                Products
+              </NavLink>
+              <NavLink
+                to="/myorders"
+                className={({ isActive }) => isActive ? "text-[#FFAD33] font-semibold" : ""}
+                onClick={() => setIsMenuClicked(false)}
+              >
+                My Orders
+              </NavLink>
+              <NavLink
+                to="/myprofile"
+                className={({ isActive }) => isActive ? "text-[#FFAD33] font-semibold" : ""}
+                onClick={() => setIsMenuClicked(false)}
+              >
+                My Profile
+              </NavLink>
+              <NavLink
+                to="/contact"
+                className={({ isActive }) => isActive ? "text-[#FFAD33] font-semibold" : ""}
+                onClick={() => setIsMenuClicked(false)}
+              >
+                Contact
+              </NavLink>
+              <NavLink
+                to="/cart"
+                className={({ isActive }) => isActive ? "text-[#FFAD33] font-semibold" : ""}
+                onClick={() => setIsMenuClicked(false)}
+              >
+                Cart {cartCount > 0 && `(${cartCount})`}
+              </NavLink>
+              <NavLink
+                to="/notification"
+                className={({ isActive }) => isActive ? "text-[#FFAD33] font-semibold" : ""}
+                onClick={() => setIsMenuClicked(false)}
+              >
+                Notifications {notificationCount > 0 && `(${notificationCount})`}
+              </NavLink>
+              <div
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  localStorage.removeItem("userId");
+                  navigate("/");
+                  setIsMenuClicked(false);
+                }}
+              >
+                <MdLogout className="text-xl" />
+                Logout
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
     </>
   );
 };

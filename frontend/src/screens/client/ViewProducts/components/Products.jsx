@@ -103,7 +103,7 @@ const Products = () => {
               <h2 className="text-xl font-semibold">Filters</h2>
               <button
                 onClick={resetFilters}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sxl text-blue-600 font-bold hover:text-blue-800"
               >
                 Reset All
               </button>
@@ -111,11 +111,11 @@ const Products = () => {
 
             {/* Category Filter */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <label className="block text-lg font-medium text-black-700 mb-2">Category</label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-2 border border-orange-700 rounded-md"
               >
                 <option value="all">All Categories</option>
                 {categories.map((category, index) => (
@@ -124,19 +124,19 @@ const Products = () => {
               </select>
             </div>
 
-      
+            
             
 
-            Stock Filter
+            {/* Stock Filter */}
             <div className="mb-2">
               <label className="flex items-center cursor-pointer">
                 <input
                   type="checkbox"
                   checked={inStockOnly}
                   onChange={() => setInStockOnly(!inStockOnly)}
-                  className="h-5 w-5 text-blue-600"
+                  className="h-5 w-5"
                 />
-                <span className="ml-2 text-sm font-medium text-gray-700">In Stock Only</span>
+                <span className="ml-2 text-lg font-medium text-black-700">In Stock Only</span>
               </label>
             </div>
           </div>
@@ -148,7 +148,7 @@ const Products = () => {
             {filteredProducts.length} products found
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 pr-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pr-10">
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
                 <ProductCard key={product._id} product={product} />

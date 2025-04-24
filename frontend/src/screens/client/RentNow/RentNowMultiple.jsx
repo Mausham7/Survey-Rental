@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { create_multiple_order, get_profile, imageUrl } from '../../../api/Api';
+import { create_multiple_order, get_cart, get_profile, imageUrl } from '../../../api/Api';
 
 const RentNowMultiple = () => {
   const location = useLocation();
@@ -21,6 +21,27 @@ const RentNowMultiple = () => {
     email: '',
     image: null,
   });
+
+
+  const token = localStorage.getItem('token');
+
+  const loadCart = async () => {
+    try {
+      await fetch(get_cart, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+    } catch (error) {
+      console.error('Error loading cart:', error);
+    }
+  };
+
+
+
+
+
 
   useEffect(() => {
     try {
@@ -99,6 +120,7 @@ const RentNowMultiple = () => {
 
     // Create FormData
     const formDataToSend = new FormData();
+    console.log("form data", formDataToSend);
 
     // Add customer information
     formDataToSend.append('paymentMethod', formData.paymentMethod);
@@ -118,6 +140,7 @@ const RentNowMultiple = () => {
 
     // Add cart items as JSON string
     formDataToSend.append('products', JSON.stringify(cartItems));
+    
 
     try {
       const response = await fetch(create_multiple_order, {
@@ -127,6 +150,7 @@ const RentNowMultiple = () => {
         },
         body: formDataToSend,
       });
+
 
       if (response.ok) {
         // Save form data to localStorage for future autofill (except image)
@@ -139,17 +163,21 @@ const RentNowMultiple = () => {
         }
 
         alert('Orders created successfully!');
-        // Clear cart after successful checkout
-        localStorage.removeItem('cart');
+
+
+        loadCart()
+
         // Redirect to home or orders page
         window.location.href = '/home';
       } else {
         const errorData = await response.json();
+        console.log("errorData", errorData);
         alert(`Error creating orders: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Failed to process your order. Please try again.');
+      // alert('Failed to process your order. Please try again.');
+     
     }
   };
 
@@ -171,7 +199,7 @@ const RentNowMultiple = () => {
   const calculateDeliveryCharge = () => {
     // 200 per item
     // return cartItems.reduce((sum, item) => sum + (item.quantity * 200), 0);
-    return 0;
+    return 200;
   };
 
   const calculateTotal = () => {

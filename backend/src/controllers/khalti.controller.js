@@ -31,8 +31,15 @@ export const callKhalti = async (formData, orders, req, res) => {
 
 export const handleKhaltiCallback = async (req, res, next) => {
   try {
-    const { txnId, pidx, amount, purchase_order_id, transaction_id, message } =
-      req.query;
+    const {
+      txnId,
+      pidx,
+      amount,
+      purchase_order_id,
+      order_state,
+      transaction_id,
+      message,
+    } = req.query;
     if (message) {
       return res
         .status(400)
@@ -54,9 +61,10 @@ export const handleKhaltiCallback = async (req, res, next) => {
       return res.status(400).json({ error: "Payment not completed" });
     }
 
-    console.log("This is the id: ", purchase_order_id, pidx);
+    console.log("This is the id: ", purchase_order_id, order_state, pidx);
     req.transaction_uuid = purchase_order_id;
     req.transaction_code = pidx;
+    req.state = order_state;
     next();
   } catch (err) {
     console.log(err);

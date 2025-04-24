@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom'
-import { manual_login } from "../../../api/Api";
+import { manual_login, resend_verification } from "../../../api/Api";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 const Login = () => {
@@ -11,6 +11,9 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showVerificationResend, setShowVerificationResend] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
 
   const handleSignUp = () => {
     navigate("/signup")
@@ -50,6 +53,9 @@ const Login = () => {
     }
     setError("");
     setIsLoading(true);
+    setShowVerificationResend(false);
+    setResendMessage("");
+
     try {
       const response = await fetch(manual_login, {
         method: "POST",
@@ -68,24 +74,60 @@ const Login = () => {
         } else {
           navigate('/dashboard', { replace: true });
         }
-
-
       } else {
         setIsLoading(false);
+        console.log("verification check: ", data.verified);
+
+        // Check if the error is related to email verification
+        if (data.error?.toLowerCase().includes("verify") ||
+          data.error?.toLowerCase().includes("verification") ||
+          data.verified === false) {
+          setShowVerificationResend(true);
+        }
+
         setError(`*${data.error}` || "Login failed. Please try again.");
       }
     } catch (error) {
       setIsLoading(false);
       setError("An error occurred. Please try again later.");
     }
-    setIsLoading(false);
   };
 
+  const handleResendVerification = async () => {
+    if (!email) {
+      setError("*Email is required to resend verification.");
+      return;
+    }
 
+    setResendLoading(true);
+    setResendMessage("");
+
+    try {
+      // Assuming you have a resend verification endpoint
+      const response = await fetch(resend_verification, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setResendMessage("Verification email sent successfully!");
+      } else {
+        setResendMessage(`Failed to resend: ${data.error}`);
+      }
+    } catch (error) {
+      setResendMessage("Failed to resend verification email.");
+    }
+
+    setResendLoading(false);
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
   return (
     <div className=' h-screen  flex items-center justify-evenly'>
       {isLoading && (
@@ -100,6 +142,7 @@ const Login = () => {
         {/* <h3>Enter your details below</h3> */}
         <div className='flex flex-col gap-10  '>
           {error && <div className="w-full text-red-400 text-sm">{error}</div>}
+          {resendMessage && <div className="w-full text-green-500 text-sm">{resendMessage}</div>}
           <input
             type="email"
             placeholder='E-mail or Phone Number'
@@ -113,7 +156,6 @@ const Login = () => {
               className='border-b-2 h-10 w-full outline-none'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-            // className="w-full px-4 py-3 bg-gray-100 rounded-md outline-none shadow-sm"
             />
             <span
               onClick={togglePasswordVisibility}
@@ -124,16 +166,30 @@ const Login = () => {
           </div>
           <button className='text-xl text-white border rounded-md p-2 px-4 bg-[#FFAD33]' onClick={handleLogin}>Log In</button>
         </div>
-        <div className=''>
+        <div className='flex justify-between items-center'>
+          <button className='text-[#FFAD33] text-base'>Forget Password?</button>
 
-          <button className='text-[#FFAD33] text-base'> Forget Password?</button>
+          {showVerificationResend && (
+            <button
+              className='text-[#FFAD33] text-base flex items-center'
+              onClick={handleResendVerification}
+              disabled={resendLoading}
+            >
+              {resendLoading ? (
+                <>
+                  <span className="mr-2">Sending</span>
+                  <div className="w-4 h-4"><CircularProgress size={16} /></div>
+                </>
+              ) : (
+                "Resend Verification Email"
+              )}
+            </button>
+          )}
         </div>
         <button onClick={handleSignUp}> Didn't have an account? <span className=' text-[#FFAD33] underline' >
           Sign up
-
         </span>
         </button>
-
       </div>
     </div>
   )

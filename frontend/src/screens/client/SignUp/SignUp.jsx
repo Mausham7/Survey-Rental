@@ -29,12 +29,27 @@ const SignUp = () => {
       setError('*Please enter a valid Phone Number.');
       return false;
     }
+    const nepaliPhonePattern = /^(98|97)\d{8}$/;
+    if (!nepaliPhonePattern.test(phone)) {
+      setError('*Please enter a valid Phone Number.');
+      return;
+    }
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
       setError('*Please enter a valid email address.');
       return false;
     }
+
+  // Regex to ensure at least 8 characters, with at least one letter and one number
+const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
+// Validate password
+if (!passwordPattern.test(password)) {
+  setError("Password must be at least 8 characters long and include both letters and numbers.");
+  return false;
+} 
+
 
     setError("");
     setIsLoading(true);

@@ -19,21 +19,21 @@ const Data = (data) => {
           <FaUsers />
         </div>
         <h1 className=' text-gray-400 my-2'> Total Number of Customers </h1>
-        <h1 className='text-4xl'>250</h1>
+        <h1 className='text-4xl'>0</h1>
       </div>
       <div className='w-[25%] pl-7 border-r'>
         <div className='h-16 w-16 flex justify-center text-xl items-center border bg-[#FFD699] rounded-full'>
           <IoCartOutline />
         </div>
         <h1 className=' text-gray-400 my-2'> Total Number of Orders </h1>
-        <h1 className='text-4xl'>50</h1>
+        <h1 className='text-4xl'>0</h1>
       </div>
       <div className='w-[25%] pl-7 '>
         <div className='h-16 w-16 flex justify-center text-xl items-center border bg-[#FFEBCC] rounded-full'>
           <MdWallet />
         </div>
         <h1 className=' text-gray-400 my-2'> Total Number of Sales </h1>
-        <h1 className='text-4xl'>4k</h1>
+        <h1 className='text-4xl'>0</h1>
       </div>
     </div>
   )

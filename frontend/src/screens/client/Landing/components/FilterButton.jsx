@@ -79,8 +79,8 @@ const FilterButton = () => {
               <div
                 onClick={() => handleCategoryClick(category)}
                 className={`cursor-pointer w-44 h-44 rounded-full flex flex-col justify-center items-center border transition-colors ${activeCategory === category
-                  ? "bg-[#FFAD33] text-white"
-                  : "bg-[#f3f4f6] text-[#FFAD33]"
+                  ? "bg-[orange] text-white"
+                  : "bg-[#f3f4f6] text-[orange]"
                   }`}
               >
                 <h2 className={`text-xl font-semibold`}>

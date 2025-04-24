@@ -108,6 +108,7 @@ export const getOrderById = async (req, res) => {
 export const updateOrderStatus = async (req, res) => {
   try {
     const order = await Order.findById(req.body.orderId); // Find product by ID
+    console.log("order data", order);
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
     }
@@ -142,6 +143,49 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
+export const extendOrder = async (req, res) => {
+  try {
+    const { orderId, extendDays, additionalAmount } = req.body;
+    console.log(req.body);
+
+    // Validate input
+    if (!orderId || !extendDays || !additionalAmount) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    // Update the order
+    order.days += Number(extendDays);
+    order.total += Number(additionalAmount);
+    await order.save();
+    console.log(order);
+
+    const formData = {
+      return_url: "http://localhost:4000/api/v1/callback",
+      website_url: "http://localhost:4000",
+      amount: additionalAmount * 100, //paisa
+      purchase_order_id: order.trackingNumber,
+      order_state: "new",
+      purchase_order_name: "test",
+    };
+    console.log(formData);
+    callKhalti(formData, order, req, res);
+
+    // res.status(200).json({
+    //   message: "Order extended successfully.",
+    //   updatedOrder: order,
+    // });
+  } catch (error) {
+    console.error("Error extending order:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+};
+
 // DELETE - Delete an order
 export const deleteOrder = async (req, res) => {
   try {
@@ -158,7 +202,7 @@ export const deleteOrder = async (req, res) => {
 
 export const addMultipleOrders = async (req, res) => {
   const {
-    products, // array of products (expected as an array)
+    products, // stringified JSON array
     paymentMethod,
     fullName,
     citizenID,
@@ -170,19 +214,48 @@ export const addMultipleOrders = async (req, res) => {
     totalAmount,
   } = req.body;
 
-  console.log(req.body);
-  console.log(req.body.fullName);
   const imagePath = req.uploadedFileName || null;
   const trackingNumber = generateTrackingNumber();
-  console.log("trackingNumber", trackingNumber);
 
   try {
-    // Check if products is a string; if so, parse it into an array.
-    let parsedProducts = products;
-    if (typeof products === "string") {
-      parsedProducts = JSON.parse(products);
+    // Validate presence of all required fields
+    if (
+      !products ||
+      !paymentMethod ||
+      !fullName ||
+      !citizenID ||
+      !streetAddress ||
+      !townCity ||
+      !phone ||
+      !email ||
+      !totalAmount ||
+      !imagePath
+    ) {
+      return res.status(400).json({
+        error:
+          "All fields including products, paymentMethod, fullName, citizenID, streetAddress, townCity, phone, email, totalAmount, and image are required.",
+      });
     }
 
+    // Parse and validate products
+    let parsedProducts = typeof products === "string" ? JSON.parse(products) : products;
+
+    if (!Array.isArray(parsedProducts) || parsedProducts.length === 0) {
+      return res.status(400).json({ error: "At least one product is required." });
+    }
+
+    // Validate each product in the array
+    for (const product of parsedProducts) {
+      const requiredFields = ["productId", "quantity", "days", "total", "pName", "detail"];
+      const missingFields = requiredFields.filter((field) => !product[field]);
+      if (missingFields.length > 0) {
+        return res.status(400).json({
+          error: `Each product must include: ${requiredFields.join(", ")}. Missing: ${missingFields.join(", ")}`,
+        });
+      }
+    }
+
+    // Save all orders
     const orders = [];
 
     for (const item of parsedProducts) {
@@ -211,60 +284,58 @@ export const addMultipleOrders = async (req, res) => {
       orders.push(savedOrder);
     }
 
-    const customerNotification = {
+    // ✅ Create notification for customer
+    await createNotification({
       recipientId: req.user._id,
       recipientModel: "User",
       orderId: trackingNumber,
       type: "order_placed",
       isRead: false,
       title: "Order Placed Successfully",
-      message: `Your order #${trackingNumber.toString()} has been placed successfully.`,
-    };
+      message: `Your order #${trackingNumber} has been placed successfully.`,
+    });
 
-    await createNotification(customerNotification);
-
+    // ✅ Notify all admins
     const admins = await User.find({ role: "admin" });
-
     for (const admin of admins) {
-      const adminNotification = {
+      await createNotification({
         recipientId: admin._id,
         recipientModel: "User",
         orderId: trackingNumber,
         type: "order_placed",
         title: "New Order Received",
         isRead: false,
-        message: `New order #${trackingNumber.toString()} has been placed by ${
-          req.user.fullName
-        }.`,
-      };
-      await createNotification(adminNotification);
+        message: `New order #${trackingNumber} placed by ${req.user.fullName}.`,
+      });
     }
 
+    // ✅ Handle payment
     if (paymentMethod === "khalti") {
-      console.log(paymentMethod);
       const formData = {
         return_url: "http://localhost:4000/api/v1/callback",
         website_url: "http://localhost:4000",
-        amount: totalAmount * 100, //paisa
+        amount: totalAmount * 100, // paisa
         purchase_order_id: trackingNumber,
-        purchase_order_name: "test",
+        order_state: "new",
+        purchase_order_name: "survey rental",
       };
-      console.log(formData);
-      callKhalti(formData, orders, req, res);
-    } else if (paymentMethod === "COD") {
-      res.status(201).json("order created successfully");
+      return callKhalti(formData, orders, req, res);
     }
+
+    // ✅ Return success
+    return res.status(201).json({ message: "Order created successfully", orders });
   } catch (error) {
     console.error("Multiple Order Error:", error);
-    res.status(500).json({ error: "Failed to place orders" });
+    return res.status(500).json({ error: "Failed to place orders" });
   }
 };
+
 
 export const updateOrderAfterPayment = async (req, res, next) => {
   try {
     console.log(req.body);
 
-    const { transaction_uuid, transaction_code } = req.body;
+    const { transaction_uuid, transaction_code } = req;
 
     const result = await Order.updateMany(
       { trackingNumber: transaction_uuid },

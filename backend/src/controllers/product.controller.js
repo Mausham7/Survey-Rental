@@ -2,31 +2,28 @@ import { Order } from "../models/order.model.js";
 import { Product } from "../models/product.models.js";
 
 export const addProduct = async (req, res) => {
-  // Use the correct file-upload middleware property if needed
-  const imagePath = req.file ? req.file.filename : "no-image.jpg"; // default image if missing
+  const imagePath = req.uploadedFileName || null;
+  console.log(imagePath);
+
   const { pName, detail, price, category, stock } = req.body;
-
-  console.log("Request file:", req.file);
-  console.log("Request body:", req.body);
-
+  console.log(req.body);
   try {
-    const product = new Product({
+    let product = new Product({
       pName,
       detail,
       price,
       category,
-      stock: stock !== undefined ? stock : 0, // default stock if not provided
+      stock,
       image: imagePath,
     });
     await product.save();
+    console.log(product);
     res.status(201).json({ product });
   } catch (error) {
-    console.error("Error message:", error.message);
-    console.error("Stack trace:", error.stack);
-    res.status(500).json({ error: "Server error " });
+    console.log(error);
+    res.status(500).json({ error: "Server error" });
   }
 };
-
 
 // Fetch all products
 export const getAllProducts = async (req, res) => {
