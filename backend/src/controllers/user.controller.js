@@ -1,4 +1,6 @@
 import { User } from "../models/user.models.js";
+import { Product } from "../models/product.models.js";
+import { Order } from "../models/order.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import bcrypt from "bcryptjs";
 
@@ -80,5 +82,31 @@ export const getAllUsers = async (req, res) => {
   } catch (err) {
     console.error("Error fetching users:", err);
     res.status(500).json({ error: "Server error" });
+  }
+};
+export const getStats = async (req, res) => {
+  try {
+    // Get total number of products
+    const totalProducts = await Product.countDocuments();
+
+    // Get total number of customers
+    const totalCustomers = await User.countDocuments({ role: "customer" });
+
+    // Get total earned (sum of 'total' field where paymentStatus is 'paid')
+    const orders = await Order.find({ paymentStatus: "paid" });
+    const totalEarned = orders.reduce((sum, order) => sum + order.total, 0);
+
+    // Get total number of sales (count of paid/completed orders)
+    const totalSales = await Order.countDocuments({ paymentStatus: "paid" });
+
+    res.json({
+      totalProducts,
+      totalCustomers,
+      totalEarned,
+      totalSales,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Something went wrong" });
   }
 };

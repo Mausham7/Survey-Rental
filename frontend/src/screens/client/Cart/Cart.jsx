@@ -237,7 +237,7 @@ const CartPage = () => {
                             <h3 className="text-lg font-medium">{item.pName}</h3>
                             <button
                               onClick={() => handleRemoveItem(item.productId)}
-                              className="text-gray-400 hover:text-red-500 transition-colors"
+                              className="text-red-600 hover:text-red-400 transition-colors"
                               aria-label="Remove item"
                             >
                               <Trash2 size={20} />

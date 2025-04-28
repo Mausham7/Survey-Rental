@@ -158,7 +158,7 @@ const Dashboard = () => {
         },
         body: JSON.stringify({ productId, stock: Number(newStock) })
       });
-  
+
       if (response.ok) {
         fetchProducts(); // Refresh product list after update
       } else {
@@ -168,20 +168,18 @@ const Dashboard = () => {
       console.error('Error updating stock:', error);
     }
   };
-  
+
 
   return (
     <div className='flex'>
       <Menu />
-      <div className='w-full flex-col justify-items-center  '>
-        
-        <Data data={products.length} />
+      <div className='w-full ml-52 flex-col justify-items-center  '>
+
+        <Data/>
         <div className='h-auto w-[95%] border rounded-lg'>
           <div className='p-3 flex justify-between'>
             <h2 className='text-lg font-medium  '>Product Lists</h2>
             <div className='flex items-center'>
-              <MdSort className='text-2xl' />
-              <button className='h-5 flex p-4 mx-3 rounded-lg items-center bg-[#FFAD333B]'>See All</button>
               <button onClick={() => setShowPopup(true)} className='h-5 flex p-4 rounded-lg items-center bg-[#FFC266]'>+ Add Product</button>
             </div>
           </div>

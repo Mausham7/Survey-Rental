@@ -23,7 +23,7 @@ import {
   updateOrderAfterPayment,
   updateOrderStatus,
 } from "../controllers/order.controller.js";
-import { getAllUsers, getProfile, updateProfile } from "../controllers/user.controller.js";
+import { getAllUsers, getProfile, getStats, updateProfile } from "../controllers/user.controller.js";
 import { handleKhaltiCallback } from "../controllers/khalti.controller.js";
 import { getNotifications, markAllNotificationsAsSeen, notificationCount } from "../controllers/notification.controller.js";
 import { addToCart, cartCount, clearCart, getCart, removeFromCart, syncCart, updateCartItem } from "../controllers/cart.controller.js";
@@ -59,6 +59,7 @@ router
   .route("/user/createmultipleorders")
   .post(verifyJWT, upload2.single("image"), addMultipleOrders);
 router.route("/admin/order/getallorders").get(verifyJWT, getAllOrders);
+router.route("/admin/stats").get(verifyJWT, getStats);
 router.route("/user/order/getmyorders").get(verifyJWT, getMyOrders);
 router.route("/admin/order/getorder:id").get(verifyJWT, getOrderById);
 router.route("/admin/order/update").post(verifyJWT, updateOrderStatus);

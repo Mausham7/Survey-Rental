@@ -4,7 +4,7 @@ import { FaTruckFast } from "react-icons/fa6";
 import { GiReturnArrow } from "react-icons/gi";
 import { useNavigate, useParams } from 'react-router-dom';
 import Carousel from './Carousel';
-import { getProductById, imageUrl } from '../../../../api/Api';
+import { add_to_cart, getProductById, imageUrl } from '../../../../api/Api';
 
 
 const Details = () => {
@@ -36,36 +36,36 @@ const Details = () => {
     console.log(cartItem)
     window.location.href = `/rent-now/multi?cart=${encodeURIComponent(JSON.stringify(cartItem))}`;
   }
-  const handleAddToCart = () => {
-    const cartItem = {
-      productId: productData._id,
-      quantity: quantity,
-      days: dayCount * (duration == "days" ? 1 : 30),
-      total: productData.price * quantity * dayCount * (duration == "days" ? 1 : 30),
-      pName: productData.pName,
-      details: productData.detail,
-      deliveryDate: deliveryDate,
-      image: productData.image
-    };
 
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-    // Check if item already exists in cart
-    const existingItemIndex = cart.findIndex(item => item.productId === productData._id);
 
-    if (existingItemIndex !== -1) {
-      // Update quantity and total if item exists
-      cart[existingItemIndex].quantity = cart[existingItemIndex].quantity + quantity;
-      cart[existingItemIndex].days = cart[existingItemIndex].days + (dayCount * (duration == "days" ? 1 : 30));
-      cart[existingItemIndex].total = cart[existingItemIndex].total + productData.price * quantity * dayCount * (duration == "days" ? 1 : 30);
-    } else {
-      // Add new item if not found
-      cart.push(cartItem);
+  const handleAddToCart = async () => {
+    try {
+      const response = await fetch(add_to_cart, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          productId: productData._id,
+          quantity: quantity,
+          days: dayCount * (duration == "days" ? 1 : 30),
+          deliveryDate: deliveryDate,
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        alert("Item added to cart!");
+      } else {
+        throw new Error(data.message || 'Failed to add item to cart');
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert(error.message);
     }
-
-    localStorage.setItem('cart', JSON.stringify(cart));
-
-    alert("Item added to cart!");
   };
 
 

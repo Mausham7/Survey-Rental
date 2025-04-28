@@ -1,4 +1,6 @@
+import sendEmail from "../middlewares/sendEmail.js";
 import { Order } from "../models/order.model.js";
+import { Product } from "../models/product.models.js";
 import { User } from "../models/user.models.js";
 import { callKhalti } from "./khalti.controller.js";
 import { createNotification } from "./notification.controller.js";
@@ -120,6 +122,22 @@ export const updateOrderStatus = async (req, res) => {
     ) {
       order.paymentStatus = "paid";
     }
+    if (req.body.orderStatus === "completed") {
+
+      if (order) {
+        const product = await Product.findById(order.productId);
+        if (product) {
+          product.stock += order.quantity;
+
+          // Optional: If stock becomes greater than 0, mark it as inStock
+          if (product.stock > 0) {
+            product.inStock = true;
+          }
+
+          await product.save();
+        }
+      }
+    }
     await order.save(); // Save the updated product
 
     const customerNotification = {
@@ -135,6 +153,36 @@ export const updateOrderStatus = async (req, res) => {
     };
 
     await createNotification(customerNotification);
+    if (req.body.orderStatus === "shipped") {
+      await sendEmail({
+        email: order.emailAddress,
+        subject: "Your Order has been shipped!",
+        message: `
+              Dear ${order.fullName},
+              
+              We have shipped your order. Thank you for choosing Us!
+              
+              Best regards,
+              Your Survey Rental Team
+            `,
+      });
+    }
+    if (req.body.orderStatus === "delivered") {
+      await sendEmail({
+        email: order.emailAddress,
+        subject: "Your Order has been delivered!",
+        message: `
+              Dear ${order.fullName},
+              
+              We have delivered your order on your location. Thank you for choosing Us!
+              
+              Best regards,
+              Your Survey Rental Team
+            `,
+      });
+    }
+
+    
 
     res.status(200).json({ message: "Order status updated", order });
   } catch (error) {
@@ -174,6 +222,18 @@ export const extendOrder = async (req, res) => {
       purchase_order_name: "test",
     };
     console.log(formData);
+    const admins = await User.find({ role: "admin" });
+    for (const admin of admins) {
+      await createNotification({
+        recipientId: admin._id,
+        recipientModel: "User",
+        orderId: order.trackingNumber,
+        type: "order_placed",
+        title: "Order Extended",
+        isRead: false,
+        message: `Order of tracking number: #${order.trackingNumber} has been extended by ${req.user.fullName}.`,
+      });
+    }
     callKhalti(formData, order, req, res);
 
     // res.status(200).json({
@@ -238,19 +298,31 @@ export const addMultipleOrders = async (req, res) => {
     }
 
     // Parse and validate products
-    let parsedProducts = typeof products === "string" ? JSON.parse(products) : products;
+    let parsedProducts =
+      typeof products === "string" ? JSON.parse(products) : products;
 
     if (!Array.isArray(parsedProducts) || parsedProducts.length === 0) {
-      return res.status(400).json({ error: "At least one product is required." });
+      return res
+        .status(400)
+        .json({ error: "At least one product is required." });
     }
 
     // Validate each product in the array
     for (const product of parsedProducts) {
-      const requiredFields = ["productId", "quantity", "days", "total", "pName", "detail"];
+      const requiredFields = [
+        "productId",
+        "quantity",
+        "days",
+        "total",
+        "pName",
+        "detail",
+      ];
       const missingFields = requiredFields.filter((field) => !product[field]);
       if (missingFields.length > 0) {
         return res.status(400).json({
-          error: `Each product must include: ${requiredFields.join(", ")}. Missing: ${missingFields.join(", ")}`,
+          error: `Each product must include: ${requiredFields.join(
+            ", "
+          )}. Missing: ${missingFields.join(", ")}`,
         });
       }
     }
@@ -282,6 +354,20 @@ export const addMultipleOrders = async (req, res) => {
 
       const savedOrder = await order.save();
       orders.push(savedOrder);
+
+      // 🔥 Update product stock after order is saved
+      const product = await Product.findById(item.productId);
+      if (product) {
+        product.stock -= item.quantity;
+
+        // Optional: If stock goes to 0 or below, mark as out of stock
+        if (product.stock <= 0) {
+          product.stock = 0;
+          product.inStock = false;
+        }
+
+        await product.save();
+      }
     }
 
     // ✅ Create notification for customer
@@ -308,6 +394,18 @@ export const addMultipleOrders = async (req, res) => {
         message: `New order #${trackingNumber} placed by ${req.user.fullName}.`,
       });
     }
+    await sendEmail({
+      email: email,
+      subject: "Thank you for placing Order!",
+      message: `
+            Dear ${fullName},
+            
+            We have received your order. Thank you for choosing Us!
+            
+            Best regards,
+            Your Survey Rental Team
+          `,
+    });
 
     // ✅ Handle payment
     if (paymentMethod === "khalti") {
@@ -323,13 +421,14 @@ export const addMultipleOrders = async (req, res) => {
     }
 
     // ✅ Return success
-    return res.status(201).json({ message: "Order created successfully", orders });
+    return res
+      .status(201)
+      .json({ message: "Order created successfully", orders });
   } catch (error) {
     console.error("Multiple Order Error:", error);
     return res.status(500).json({ error: "Failed to place orders" });
   }
 };
-
 
 export const updateOrderAfterPayment = async (req, res, next) => {
   try {

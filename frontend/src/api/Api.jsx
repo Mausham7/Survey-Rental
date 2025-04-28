@@ -27,6 +27,7 @@ export const notification_count = `${url}/notification/count`
 export const notification_markseen = `${url}/notification/markseen`
 export const cart_count = `${url}/cart/count`
 export const get_All_Users = `${url}/admin/getallusers`
+export const admin_stats = `${url}/admin/stats`
 
 
 export const get_profile = `${url}/user/getprofile`

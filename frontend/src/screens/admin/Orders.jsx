@@ -119,7 +119,7 @@ const Orders = () => {
     <div className='flex'>
       <Menu />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container ml-52 mx-auto px-4 py-8">
         <Data data={orders.length} />
         <h1 className="text-2xl font-bold mb-6">Orders Management</h1>
 
@@ -145,25 +145,74 @@ const Orders = () => {
         )}
 
         {isViewModalOpen && selectedOrder && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full p-6">
-              <h2 className="text-xl font-bold mb-4">Order Details</h2>
-              <p><strong>Order ID:</strong> {selectedOrder._id}</p>
-              <p><strong>Product:</strong> {selectedOrder.product}</p>
-              <p><strong>Customer:</strong> {selectedOrder.customerDetails.firstName}</p>
-              <p><strong>Total Price:</strong> Rs. {selectedOrder.totalPrice}</p>
-              <p><strong>Payment Method:</strong> {selectedOrder.paymentStatus}</p>
-              <p><strong>Order Status:</strong> {selectedOrder.orderStatus}</p>
-              <p><strong>Rental Duration:</strong> {selectedOrder.rentalDuration} days</p>
-              <p><strong>Customer Phone:</strong> {selectedOrder.customerDetails.phoneNumber}</p>
-              <p><strong>Customer Email:</strong> {selectedOrder.customerDetails.email}</p>
-              <p><strong>Address:</strong> {selectedOrder.customerDetails.streetAddress}, {selectedOrder.customerDetails.city}</p>
-              <br />
-              <p><strong>Citizenship Photo:</strong> </p>
-              <br />
-              <img className='h-[20rem]' src={`${imageUrl}/${selectedOrder.image}`} />
-              <div className="mt-4">
-                <button className="px-4 py-2 bg-gray-200 rounded" onClick={() => setIsViewModalOpen(false)}>Close</button>
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 overflow-y-auto">
+            <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-full overflow-y-auto my-4 mx-auto">
+              <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
+                <h2 className="text-xl font-bold text-gray-800">Order Details</h2>
+                <button
+                  onClick={() => setIsViewModalOpen(false)}
+                  className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="font-semibold text-gray-700 mb-3">Order Information</h3>
+                      <div className="space-y-2">
+                        <p><span className="font-medium text-gray-600">Order ID:</span> {selectedOrder._id}</p>
+                        <p><span className="font-medium text-gray-600">Product:</span> {selectedOrder.product}</p>
+                        <p><span className="font-medium text-gray-600">Total Price:</span> Rs. {selectedOrder.totalPrice}</p>
+                        <p><span className="font-medium text-gray-600">Payment Method:</span> {selectedOrder.paymentStatus}</p>
+                        <p><span className="font-medium text-gray-600">Order Status:</span>
+                          <span className={`ml-2 px-2 py-1 text-sm rounded ${selectedOrder.orderStatus === 'Completed' ? 'bg-green-100 text-green-800' :
+                              selectedOrder.orderStatus === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-blue-100 text-blue-800'
+                            }`}>
+                            {selectedOrder.orderStatus}
+                          </span>
+                        </p>
+                        <p><span className="font-medium text-gray-600">Rental Duration:</span> {selectedOrder.rentalDuration} days</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="font-semibold text-gray-700 mb-3">Customer Details</h3>
+                      <div className="space-y-2">
+                        <p><span className="font-medium text-gray-600">Name:</span> {selectedOrder.customerDetails.firstName}</p>
+                        <p><span className="font-medium text-gray-600">Phone:</span> {selectedOrder.customerDetails.phoneNumber}</p>
+                        
+                        <p><span className="font-medium text-gray-600">Address:</span> {selectedOrder.customerDetails.streetAddress}, {selectedOrder.customerDetails.city}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-gray-700 mb-3">Citizenship Document</h3>
+                    <div className="flex justify-center">
+                      <img
+                        className="max-h-80 w-auto object-contain rounded-lg shadow"
+                        src={`${imageUrl}/${selectedOrder.image}`}
+                        alt="Citizenship document"
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="sticky bottom-0 bg-white p-4 border-t flex justify-end">
+                <button
+                  className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+                  onClick={() => setIsViewModalOpen(false)}
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>
