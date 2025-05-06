@@ -37,7 +37,7 @@ export const getAllProducts = async (req, res) => {
 };
 export const getCataProducts = async (req, res) => {
   try {
-    console.log("Hit")
+    console.log("Hit");
     const products = await Product.find().sort({ createdAt: -1 }); // Fetch all products
     res.status(200).json({ products });
   } catch (error) {
@@ -109,9 +109,7 @@ export const updateStockNumber = async (req, res) => {
     product.stock = stock; // Update inStock value
     await product.save(); // Save the updated product
 
-    res
-      .status(200)
-      .json({ message: "Product Stock updated", product });
+    res.status(200).json({ message: "Product Stock updated", product });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Server error" });
@@ -141,5 +139,38 @@ export const updateFlashSale = async (req, res) => {
   }
 };
 
+export const giveRating = async (req, res) => {
+  console.log(req.body)
+  try {
+    const { productId, rating } = req.body;
 
+    if (!productId || typeof rating !== "number" || rating < 1 || rating > 5) {
+      return res
+        .status(400)
+        .json({
+          message: "Invalid productId or rating (must be between 1 and 5).",
+        });
+    }
 
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found." });
+    }
+
+    // Calculate new average rating
+    const totalRating = product.rating * product.NumberOfReview;
+    const newTotalRating = totalRating + rating;
+    const newNumberOfReview = product.NumberOfReview + 1;
+
+    product.rating = newTotalRating / newNumberOfReview;
+    product.NumberOfReview = newNumberOfReview;
+
+    await product.save();
+
+    res.status(200).json({ message: "Rating submitted successfully", product });
+  } catch (error) {
+    console.error("Error giving rating:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

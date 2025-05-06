@@ -133,7 +133,7 @@ if (!passwordPattern.test(password)) {
           />
         </div>
         <button
-          className="text-xl text-white border rounded-md py-2 bg-[#FFAD33]"
+          className="text-xl text-white border rounded-md px-2 py-2 bg-[#FFAD33]"
           onClick={handleSignUp}
         >
           Sign up

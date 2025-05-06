@@ -8,6 +8,7 @@ import {
   getCataProducts,
   getFlashSaleProducts,
   getProductById,
+  giveRating,
   updateFlashSale,
   updateInStock,
   updateStockNumber,
@@ -27,6 +28,7 @@ import { getAllUsers, getProfile, getStats, updateProfile } from "../controllers
 import { handleKhaltiCallback } from "../controllers/khalti.controller.js";
 import { getNotifications, markAllNotificationsAsSeen, notificationCount } from "../controllers/notification.controller.js";
 import { addToCart, cartCount, clearCart, getCart, removeFromCart, syncCart, updateCartItem } from "../controllers/cart.controller.js";
+import { forgotPassword, forgotPasswordReset, verifyOtp } from "../controllers/forgotPassword.controller.js";
 
 const router = Router();
 
@@ -50,6 +52,7 @@ router.route("/user/getallproducts").get(verifyJWT, getAllProducts);
 router.route("/user/getCataProducts").post(verifyJWT, getCataProducts);
 router.route("/user/productbyid").post(verifyJWT, getProductById);
 router.route("/user/flashsale").get(verifyJWT, getFlashSaleProducts);
+router.route("/user/giverating").post(verifyJWT, giveRating);
 
 //order routes
 router
@@ -90,5 +93,10 @@ router.route("/cart/item/:productId").put(verifyJWT, updateCartItem);
 router.route("/cart/item/:productId").delete(verifyJWT, removeFromCart);
 router.route("/cart").delete(verifyJWT, clearCart);
 router.route("/cart/sync").post(verifyJWT, syncCart);
+
+//OTP ROUTES
+router.route("/user/forgotpassword").post(forgotPassword);
+router.route("/user/verifyotp").post(verifyOtp);
+router.route("/user/forgotpasswordreset").post(forgotPasswordReset);
 
 export default router;

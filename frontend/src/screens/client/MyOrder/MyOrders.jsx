@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Star } from 'lucide-react';
 
-import Data from '../components/UserDataCard';
-import { extend_order, get_my_orders, update_order } from '../../../api/Api';
+import { TicketCheck } from 'lucide-react';
+import { BsBoxSeam } from "react-icons/bs";
+import { FcCancel } from 'react-icons/fc';
+import { MdPending } from "react-icons/md";
+
+import { extend_order, get_my_orders, update_order, rate_order } from '../../../api/Api';
 import Header from '../components/Header';
 
 const MyOrders = () => {
@@ -10,11 +14,20 @@ const MyOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
   const [extendDays, setExtendDays] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
-
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [feedback, setFeedback] = useState('');
+  const [orderCounts, setOrderCounts] = useState({
+    total: 0,
+    processing: 0,
+    completed: 0,
+    cancelled: 0,
+  });
 
 
   const khaltiCall = (data) => {
@@ -44,6 +57,44 @@ const MyOrders = () => {
       }
     } catch (error) {
       console.error('Error updating order:', error);
+    }
+  };
+
+  const submitRating = async () => {
+    if (!selectedOrder || rating === 0) return;
+
+    try {
+      setPaymentProcessing(true); // Reuse this state for loading indicator
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(rate_order, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          productId: selectedOrder.productId._id,
+          rating: rating,
+          feedback: feedback
+        })
+      });
+
+      if (response.ok) {
+        setIsRatingModalOpen(false);
+        setRating(0);
+        setFeedback('');
+        fetchMyOrders(); // Refresh orders
+        console.log("Rating submitted successfully");
+      } else {
+        console.error('Failed to submit rating');
+        setError('Failed to submit rating. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+      setError('Error processing your request. Please try again.');
+    } finally {
+      setPaymentProcessing(false);
     }
   };
 
@@ -118,9 +169,12 @@ const MyOrders = () => {
       if (!response.ok) throw new Error('Failed to fetch orders');
 
       const data = await response.json();
+      console.log(data)
+
       const formattedOrders = data.map(order => ({
         _id: order._id,
         product: order.pName,
+        productId: order.productId,
         rentalDuration: order.days,
         totalPrice: order.total,
         paymentStatus: order.paymentStatus,
@@ -128,6 +182,7 @@ const MyOrders = () => {
         deliveryDate: new Date(order.deliveryDate),
         createdAt: new Date(order.createdAt),
         returnDate: new Date(new Date(order.deliveryDate).getTime() + (order.days * 24 * 60 * 60 * 1000)),
+        hasRated: order.hasRated || false, // Add this field to track if order has been rated
         customerDetails: {
           fullName: order.fullName,
           phone: order.phone,
@@ -137,6 +192,22 @@ const MyOrders = () => {
       }));
 
       setOrders(formattedOrders);
+
+      console.log(formattedOrders)
+
+      // Count statuses
+      const counts = {
+        processing: 0,
+        completed: 0,
+        cancelled: 0,
+      };
+
+      for (const order of data) {
+        const status = order.orderStatus?.toLowerCase();
+        if (status in counts) counts[status]++;
+      }
+
+      setOrderCounts(counts);
     } catch (err) {
       setError(err.message || "Error loading orders");
     } finally {
@@ -149,11 +220,45 @@ const MyOrders = () => {
     return order.orderStatus !== 'completed' && order.orderStatus !== 'cancelled';
   };
 
+  // Determine if an order can be rated
+  const canRateOrder = (order) => {
+    return order.orderStatus === 'completed' && !order.hasRated;
+  };
+
   return (
     <div className='h-[101vh]'>
       <Header />
       <div className="container mx-auto px-4 py-8">
-        <Data data={orders.length} />
+        <div className='h-52 w-[95%] py-7 my-5 flex border rounded-xl'>
+          <div className='w-[25%] pl-7 border-r'>
+            <div className='h-16 w-16 flex justify-center text-xl items-center border bg-[#FFAD33] rounded-full'>
+              <BsBoxSeam />
+            </div>
+            <h1 className=' text-gray-400 my-2'>Total Orders </h1>
+            <h1 className='text-4xl'>{orders.length}</h1>
+          </div>
+          <div className='w-[25%] pl-7 border-r'>
+            <div className='h-16 w-16 flex justify-center text-xl items-center border bg-[#FFC266] rounded-full'>
+              <MdPending />
+            </div>
+            <h1 className=' text-gray-400 my-2'> Pending Orders </h1>
+            <h1 className='text-4xl'>{orderCounts.processing}</h1>
+          </div>
+          <div className='w-[25%] pl-7 border-r'>
+            <div className='h-16 w-16 flex justify-center text-xl items-center border bg-[#FFD699] rounded-full'>
+              <TicketCheck />
+            </div>
+            <h1 className=' text-gray-400 my-2'> Completed Orders </h1>
+            <h1 className='text-4xl'>{orderCounts.completed}</h1>
+          </div>
+          <div className='w-[25%] pl-7 '>
+            <div className='h-16 w-16 flex justify-center text-xl items-center border bg-[#FFEBCC] rounded-full'>
+              <FcCancel />
+            </div>
+            <h1 className=' text-gray-400 my-2'> Cancelled Orders </h1>
+            <h1 className='text-4xl'>{orderCounts.cancelled}</h1>
+          </div>
+        </div>
         <h1 className="text-2xl font-bold mb-6">My Orders</h1>
 
         {error && (
@@ -200,7 +305,14 @@ const MyOrders = () => {
                         {order.paymentStatus}
                       </span>
                     </td>
-                    <td className="px-6 py-4">{order.orderStatus}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium 
+                        ${order.orderStatus === "completed" ? "bg-green-100 text-green-700" :
+                          order.orderStatus === "cancelled" ? "bg-red-100 text-red-700" :
+                            "bg-blue-100 text-blue-700"}`}>
+                        {order.orderStatus}
+                      </span>
+                    </td>
                     <td className="px-6 py-4">{order.deliveryDate.toDateString()}</td>
                     <td className="px-6 py-4">{order.returnDate.toDateString()}</td>
                     <td className="px-6 py-4 space-x-2">
@@ -219,6 +331,19 @@ const MyOrders = () => {
                           onClick={() => updateStatus(order._id)}
                         >
                           Cancel
+                        </button>
+                      )}
+                      {canRateOrder(order) && (
+                        <button
+                          className="text-yellow-600 hover:underline"
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setRating(0);
+                            setFeedback('');
+                            setIsRatingModalOpen(true);
+                          }}
+                        >
+                          Rate
                         </button>
                       )}
                       {canExtendRental(order) && (
@@ -272,6 +397,19 @@ const MyOrders = () => {
                     }}
                   >
                     Cancel Order
+                  </button>
+                )}
+                {canRateOrder(selectedOrder) && (
+                  <button
+                    className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded"
+                    onClick={() => {
+                      setIsViewModalOpen(false);
+                      setRating(0);
+                      setFeedback('');
+                      setIsRatingModalOpen(true);
+                    }}
+                  >
+                    Rate Product
                   </button>
                 )}
                 {canExtendRental(selectedOrder) && (
@@ -351,6 +489,74 @@ const MyOrders = () => {
                     </>
                   ) : (
                     'Pay & Extend'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Rating Modal */}
+        {isRatingModalOpen && selectedOrder && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+              <h2 className="text-xl font-bold mb-4">Rate Your Experience</h2>
+              <p><strong>Product:</strong> {selectedOrder.product}</p>
+
+              <div className="my-6">
+                <label className="block text-gray-700 mb-2">Your Rating:</label>
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      className="focus:outline-none"
+                      onClick={() => setRating(star)}
+                      onMouseEnter={() => setHoverRating(star)}
+                      onMouseLeave={() => setHoverRating(0)}
+                    >
+                      <Star
+                        className={`h-8 w-8 ${(hoverRating || rating) >= star
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-gray-300"
+                          }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="my-4">
+                <label className="block text-gray-700 mb-2">Your Feedback (Optional):</label>
+                <textarea
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows="3"
+                  placeholder="Share your experience with this product..."
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                ></textarea>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded"
+                  onClick={() => setIsRatingModalOpen(false)}
+                  disabled={paymentProcessing}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded flex items-center justify-center disabled:opacity-70"
+                  onClick={submitRating}
+                  disabled={rating === 0 || paymentProcessing}
+                >
+                  {paymentProcessing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                      Submitting...
+                    </>
+                  ) : (
+                    'Submit Rating'
                   )}
                 </button>
               </div>

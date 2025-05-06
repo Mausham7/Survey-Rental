@@ -446,11 +446,7 @@ export const updateOrderAfterPayment = async (req, res, next) => {
       }
     );
 
-    if (result.modifiedCount === 0) {
-      return res
-        .status(404)
-        .json({ error: "No matching orders found to update." });
-    }
+    
 
     // const customerNotification = {
     //   recipientId: req.user._id,

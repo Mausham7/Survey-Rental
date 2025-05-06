@@ -20,8 +20,13 @@ import RentNowMultiple from './screens/client/RentNow/RentNowMultiple.jsx';
 import Notification from './screens/client/Notification/Notification.jsx';
 import AdminNotification from './screens/admin/AdminNotification.jsx';
 import UserList from './screens/admin/UserList.jsx';
+import ForgotPassword from './screens/client/LogIn/ForgotPassword.jsx';
 
-const role = "client"//admin
+// const role = "client"//admin
+
+import ProtectedRoute from './ProtectedRoutes.jsx';
+
+const role = "customer"; // You should get this from context or state ideally
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -36,17 +41,53 @@ createRoot(document.getElementById('root')).render(
           <Route path="/rent-now/multi" element={<RentNowMultiple />} />
           <Route path="contact" element={<Contact />} />
           <Route path="product/:productId" element={<ProductDetails />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="orders" element={<Orders />} />
-          <Route path="myorders" element={<MyOrders />} />
-          <Route path="myprofile" element={<UserProfile />} />
-          <Route path="cart" element={<CartPage />} />
-          <Route path="notification" element={<Notification />} />
-          <Route path="adminnotification" element={<AdminNotification />} />
-          <Route path="allusers" element={<UserList />} />
+          <Route path="forgotpassword" element={<ForgotPassword />} />
 
+          {/* CLIENT Routes */}
+          <Route path="myorders" element={
+            <ProtectedRoute allowedRoles={['customer']} role={role}>
+              <MyOrders />
+            </ProtectedRoute>
+          } />
+          <Route path="myprofile" element={
+            <ProtectedRoute allowedRoles={['customer']} role={role}>
+              <UserProfile />
+            </ProtectedRoute>
+          } />
+          <Route path="cart" element={
+            <ProtectedRoute allowedRoles={['customer']} role={role}>
+              <CartPage />
+            </ProtectedRoute>
+          } />
+          <Route path="notification" element={
+            <ProtectedRoute allowedRoles={['customer']} role={role}>
+              <Notification />
+            </ProtectedRoute>
+          } />
+
+          {/* ADMIN Routes */}
+          <Route path="dashboard" element={
+            <ProtectedRoute allowedRoles={['admin']} role={role}>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="orders" element={
+            <ProtectedRoute allowedRoles={['admin']} role={role}>
+              <Orders />
+            </ProtectedRoute>
+          } />
+          <Route path="adminnotification" element={
+            <ProtectedRoute allowedRoles={['admin']} role={role}>
+              <AdminNotification />
+            </ProtectedRoute>
+          } />
+          <Route path="allusers" element={
+            <ProtectedRoute allowedRoles={['admin']} role={role}>
+              <UserList />
+            </ProtectedRoute>
+          } />
         </Route>
       </Routes>
     </Router>
   </StrictMode>
-)
+);

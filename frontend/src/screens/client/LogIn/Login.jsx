@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { manual_login, resend_verification } from "../../../api/Api";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
@@ -18,10 +18,6 @@ const Login = () => {
   const handleSignUp = () => {
     navigate("/signup")
   }
-  const handleLogIn = () => {
-    navigate("/home")
-  }
-
   // Prevent back navigation
   useEffect(() => {
     // Clear all local storage items
@@ -140,15 +136,17 @@ const Login = () => {
         <center className='text-3xl font-normal text-[#ffad33]'>Log in</center>
         <center className='text-3xl font-normal text-[#ffad33]'>Survey Equipment Rental</center>
         {/* <h3>Enter your details below</h3> */}
-        <div className='flex flex-col gap-10  '>
+        <div className='flex flex-col gap-10 '>
           {error && <div className="w-full text-red-400 text-sm">{error}</div>}
           {resendMessage && <div className="w-full text-green-500 text-sm">{resendMessage}</div>}
+          
           <input
             type="email"
             placeholder='E-mail or Phone Number'
             className='border-b-2 h-10 outline-none'
             value={email}
             onChange={(e) => setEmail(e.target.value)} />
+  
           <div className="w-full relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -163,11 +161,15 @@ const Login = () => {
             >
               {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
             </span>
+                       
           </div>
+          
           <button className='text-xl text-white border rounded-md p-2 px-4 bg-[#FFAD33]' onClick={handleLogin}>Log In</button>
         </div>
+
         <div className='flex justify-between items-center'>
-          <button className='text-[#FFAD33] text-base'>Forget Password?</button>
+          {/* <button className='text-[#FFAD33] text-base'>Forget Password?</button> */}
+          <Link to="/forgotpassword" className="text-[#FFAD33] text-base">Forgot Password?</Link>
 
           {showVerificationResend && (
             <button

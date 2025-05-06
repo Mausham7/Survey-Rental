@@ -10,7 +10,10 @@ const ProductCard = ({ product }) => {
 
   const isAvailable = product.stock > 0 && product.inStock;
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = async (e) => {
+    // Stop event propagation to prevent navigation when clicking the cart button
+    e.stopPropagation();
+    
     try {
       setIsLoading(true);
 
@@ -43,11 +46,21 @@ const ProductCard = ({ product }) => {
     }
   };
 
+  const handleRentNowClick = (e) => {
+    // Stop event propagation to prevent double navigation
+    e.stopPropagation();
+    navigate(`/product/${product._id}`);
+  };
+
+  const handleCardClick = () => {
+    navigate(`/product/${product._id}`);
+  };
 
   return (
     <div
       key={product._id}
-      className="h-[25rem] shadow-md flex flex-col border border-gray-200 rounded-xl mb-2 transition-all hover:shadow-lg"
+      className="h-[25rem] shadow-md flex flex-col border border-gray-200 rounded-xl mb-2 transition-all hover:shadow-lg cursor-pointer"
+      onClick={handleCardClick}
     >
       <img
         src={`${imageUrl}/${product.image}`}
@@ -72,7 +85,7 @@ const ProductCard = ({ product }) => {
               : 'Out of Stock'}
           </span>
         </div>
-        <div className="flex justify-between w-full items-center">
+        <div className="flex justify-between w-full items-center" onClick={(e) => e.stopPropagation()}>
           <h2 className="text-[#FFAD33] text-sm font-semibold">Rs {product.price} /Day</h2>
           <div className="flex space-x-2">
             <button
@@ -84,7 +97,7 @@ const ProductCard = ({ product }) => {
             </button>
             <button
               className="bg-[#FFAD33] px-3 py-1.5 text-white rounded-lg hover:bg-amber-500 transition-all duration-300 hover:shadow-md transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-none"
-              onClick={() => navigate(`/product/${product._id}`)}
+              onClick={handleRentNowClick}
               disabled={!isAvailable}
             >
               Rent Now
