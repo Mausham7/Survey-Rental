@@ -12,6 +12,7 @@ export const add_product = `${url}/admin/addproduct`
 export const getAllProducts = `${url}/user/getallproducts`
 export const getCataProducts = `${url}/user/getCataProducts`
 export const getFlashSaleProducts = `${url}/user/flashsale`
+export const getRecommendedProducts = `${url}/user/recommended`
 export const getProductById = `${url}/user/productbyid`
 export const updateInStock = `${url}/admin/stockchange`
 export const editStock = `${url}/admin/updatestocknumber`

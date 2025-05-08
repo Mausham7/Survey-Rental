@@ -58,6 +58,41 @@ export const getFlashSaleProducts = async (req, res) => {
   }
 };
 
+export const getRecommendedProducts = async (req, res) => {
+  try {
+    // Step 1: Aggregate order counts by productId
+    const popularProducts = await Order.aggregate([
+      {
+        $group: {
+          _id: "$productId",
+          orderCount: { $sum: 1 },
+        },
+      },
+      { $sort: { orderCount: -1 } }, // Sort by order count descending
+    ]);
+
+    // Step 2: Fetch full product details and include orderCount
+    const productIds = popularProducts.map((p) => p._id);
+    const products = await Product.find({ _id: { $in: productIds } });
+
+    // Step 3: Merge orderCount into product data
+    const productsWithCount = productIds.map((id) => {
+      const product = products.find((p) => p._id.toString() === id.toString());
+      const countObj = popularProducts.find((p) => p._id.toString() === id.toString());
+      return {
+        ...product.toObject(),
+        orderCount: countObj?.orderCount || 0,
+      };
+    });
+
+    res.status(200).json({ products: productsWithCount });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+
 // Fetch product by ID
 export const getProductById = async (req, res) => {
   const { productId } = req.body; // Get product ID from the request params

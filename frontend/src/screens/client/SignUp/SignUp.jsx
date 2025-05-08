@@ -3,6 +3,7 @@ import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { manual_register } from "../../../api/Api";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -14,12 +15,19 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleLogIn = () => {
     navigate("/");
   };
 
-  const handleSignUp = async () => {
+  const handleSignUp = async (e) => {
+    e.preventDefault()
     if (!email || !password || !phone || !firstName || !lastName) {
       setError("*All fields are required.");
       return;
@@ -41,14 +49,15 @@ const SignUp = () => {
       return false;
     }
 
-  // Regex to ensure at least 8 characters, with at least one letter and one number
-const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
-// Validate password
-if (!passwordPattern.test(password)) {
-  setError("Password must be at least 8 characters long and include both letters and numbers.");
-  return false;
-} 
+
+    const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+
+    if (!passwordPattern.test(password)) {
+      setError("Password must be at least 8 characters long, include one uppercase letter, one number, and one special character.");
+      return false;
+    }
+
 
 
     setError("");
@@ -93,6 +102,7 @@ if (!passwordPattern.test(password)) {
           Create an account
         </h1>
         {/* <h3>Enter your details below</h3> */}
+        <form onSubmit={handleSignUp} className="flex flex-col">
         <div className="flex flex-col gap-10  ">
           {error && <div className="w-full text-red-400 text-sm">{error}</div>}
 
@@ -124,20 +134,38 @@ if (!passwordPattern.test(password)) {
             placeholder="Phone Number"
             className="border-b-2 h-10 outline-none"
           />
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            placeholder="Password"
-            className="border-b-2 h-10 outline-none"
-          />
+          {/* <div className="flex flex-col justify-around">
+            
+            <input type="text"
+            placeholder="text-onlyyy"
+            className="border-b-2 text-right outline-none flex justify-end" />
+<button className="border-b-2 h-10 mx-auto w-[50%] text-xl flex justify-center text-green-700 mt-2 font-semibold outline-none bg-red-700">hello</button>
+<button className="border-b-2 h-10 text-xl text-white w-full mt-2 font-semibold outline-none bg-red-700">hello</button>
+          </div> */}
+
+          <div className="w-full relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              className='border-b-2 h-10 w-full outline-none'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <span
+              onClick={togglePasswordVisibility}
+              className="absolute w-4 right-4 top-4 cursor-pointer text-xl"
+            >
+              {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
+            </span>          
+          </div>
         </div>
         <button
-          className="text-xl text-white border rounded-md px-2 py-2 bg-[#FFAD33]"
-          onClick={handleSignUp}
+          className="text-xl mt-4 text-white border rounded-md px-2 py-2 bg-[#FFAD33]"
+           type="submmit"
         >
           Sign up
         </button>
+        </form>
         <div className="text-xl border border-neutral-950 rounded-md py-2 flex items-center gap-2 justify-center">
           <div>
             {" "}

@@ -8,6 +8,7 @@ import {
   getCataProducts,
   getFlashSaleProducts,
   getProductById,
+  getRecommendedProducts,
   giveRating,
   updateFlashSale,
   updateInStock,
@@ -52,6 +53,7 @@ router.route("/user/getallproducts").get(verifyJWT, getAllProducts);
 router.route("/user/getCataProducts").post(verifyJWT, getCataProducts);
 router.route("/user/productbyid").post(verifyJWT, getProductById);
 router.route("/user/flashsale").get(verifyJWT, getFlashSaleProducts);
+router.route("/user/recommended").get(verifyJWT, getRecommendedProducts);
 router.route("/user/giverating").post(verifyJWT, giveRating);
 
 //order routes

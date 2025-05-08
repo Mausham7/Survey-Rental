@@ -352,7 +352,7 @@ const ForgotPassword = () => {
         <div className='flex justify-center items-center mt-2'>
           <button
             className="text-[#FFAD33] text-base"
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/')}
           >
             Back to Login
           </button>

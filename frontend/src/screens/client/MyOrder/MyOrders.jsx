@@ -21,6 +21,7 @@ const MyOrders = () => {
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+  const [isCancelOpen, setIsCancelOpen] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [orderCounts, setOrderCounts] = useState({
     total: 0,
@@ -52,6 +53,7 @@ const MyOrders = () => {
       if (response.ok) {
         fetchMyOrders(); // Refresh orders
         console.log("Order status updated");
+        setIsCancelOpen(false)
       } else {
         console.error('Failed to update order status');
       }
@@ -325,10 +327,15 @@ const MyOrders = () => {
                       >
                         View
                       </button>
+                     
                       {order.orderStatus === 'processing' && (
                         <button
                           className="text-red-600 hover:underline"
-                          onClick={() => updateStatus(order._id)}
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setIsCancelOpen(!isCancelOpen);
+                          }
+                          }
                         >
                           Cancel
                         </button>
@@ -558,6 +565,39 @@ const MyOrders = () => {
                   ) : (
                     'Submit Rating'
                   )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+
+
+        {isCancelOpen && selectedOrder && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+              <h2 className="text-xl font-bold mb-4">Cancel Order?</h2>
+              <p><strong>Product:</strong> {selectedOrder.product}</p>
+
+              <div className="my-6">
+                <label className="block text-gray-700 mb-2">Are you sure you want to cancel the order?</label>
+                <div className="flex items-center gap-1">
+                  
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded"
+                  onClick={() => setIsCancelOpen(false)}
+                >
+                  No
+                </button>
+                <button
+                  className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded flex items-center justify-center disabled:opacity-70"
+                  onClick={ () => updateStatus(selectedOrder._id)}
+                >
+                  Yes
                 </button>
               </div>
             </div>

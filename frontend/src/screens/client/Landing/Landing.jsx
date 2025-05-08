@@ -4,6 +4,7 @@ import Carousel from "./components/Carousel";
 import FilterButton from "./components/FilterButton";
 import FlashSales from "./components/FlashSales";
 import Footer from "../components/Footer";
+import Recommended from "./components/Recommended";
 
 
 const Landing = () => {
@@ -12,6 +13,7 @@ const Landing = () => {
       <Header />
       <Carousel />
       <FilterButton />
+      <Recommended />
       <FlashSales />
       <Footer/>
     </div>

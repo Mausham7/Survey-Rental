@@ -42,7 +42,8 @@ const Login = () => {
   //   }
   // }, []);
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault()
     if (!email || !password) {
       setError("*Email and password required.");
       return;
@@ -136,7 +137,7 @@ const Login = () => {
         <center className='text-3xl font-normal text-[#ffad33]'>Log in</center>
         <center className='text-3xl font-normal text-[#ffad33]'>Survey Equipment Rental</center>
         {/* <h3>Enter your details below</h3> */}
-        <div className='flex flex-col gap-10 '>
+        <form onSubmit={handleLogin} className='flex flex-col gap-10 '>
           {error && <div className="w-full text-red-400 text-sm">{error}</div>}
           {resendMessage && <div className="w-full text-green-500 text-sm">{resendMessage}</div>}
           
@@ -164,8 +165,8 @@ const Login = () => {
                        
           </div>
           
-          <button className='text-xl text-white border rounded-md p-2 px-4 bg-[#FFAD33]' onClick={handleLogin}>Log In</button>
-        </div>
+          <button type="submmit" className='text-xl text-white border rounded-md p-2 px-4 bg-[#FFAD33]' >Log In</button>
+        </form>
 
         <div className='flex justify-between items-center'>
           {/* <button className='text-[#FFAD33] text-base'>Forget Password?</button> */}
