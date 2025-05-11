@@ -59,7 +59,7 @@ const ProductCard = ({ product }) => {
   return (
     <div
       key={product._id}
-      className="h-[25rem] shadow-md flex flex-col border border-gray-200 rounded-xl mb-2 transition-all hover:shadow-lg cursor-pointer"
+      className="h-[25rem] shadow-md flex flex-col border border-gray-200  rounded-xl mb-2 transition-all hover:shadow-lg cursor-pointer"
       onClick={handleCardClick}
     >
       <img
@@ -89,7 +89,7 @@ const ProductCard = ({ product }) => {
           <h2 className="text-[#FFAD33] text-sm font-semibold">Rs {product.price} /Day</h2>
           <div className="flex space-x-2">
             <button
-              className="bg-purple-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg flex items-center justify-center transition-all duration-300 border border-gray-200 group disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-purple-100 hover:bg-gray-200  px-3 py-1.5 rounded-lg flex items-center justify-center transition-all duration-300 border border-gray-200 group disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!isAvailable || isLoading}
               onClick={handleAddToCart}
             >

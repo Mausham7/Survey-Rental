@@ -26,7 +26,7 @@ import ForgotPassword from './screens/client/LogIn/ForgotPassword.jsx';
 
 import ProtectedRoute from './ProtectedRoutes.jsx';
 
-const role = "customer"; // You should get this from context or state ideally
+const role = localStorage.getItem("role") // You should get this from context or state ideally
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

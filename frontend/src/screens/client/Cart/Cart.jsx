@@ -18,7 +18,7 @@ const CartPage = () => {
   const token = localStorage.getItem('token');
 
   const loadCart = async () => {
-    setIsLoading(true);
+    setIsLoading(false);
     try {
       const response = await fetch(get_cart, {
         method: 'GET',
@@ -41,7 +41,7 @@ const CartPage = () => {
 
   const handleRemoveItem = async (productId) => {
     try {
-      setIsLoading(true);
+      setIsLoading(false);
       await fetch(remove_from_cart(productId), {
         method: 'DELETE',
         headers: {
@@ -62,7 +62,7 @@ const CartPage = () => {
     if (newQuantity < 1) return;
 
     try {
-      setIsLoading(true);
+      setIsLoading(false);
       await fetch(update_cart_item(productId), {
         method: 'PUT',
         headers: {
@@ -85,7 +85,7 @@ const CartPage = () => {
     if (newDays < 1) return;
 
     try {
-      setIsLoading(true);
+      setIsLoading(false);
       await fetch(update_cart_item(productId), {
         method: 'PUT',
         headers: {
@@ -106,7 +106,7 @@ const CartPage = () => {
 
   const handleDateChange = async (productId, daysToAdd) => {
     try {
-      setIsLoading(true);
+      setIsLoading(false);
 
       const currentItem = cart.items.find(item => item.productId === productId);
       const currentDate = new Date(currentItem.deliveryDate);

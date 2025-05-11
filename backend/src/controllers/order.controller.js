@@ -123,7 +123,6 @@ export const updateOrderStatus = async (req, res) => {
       order.paymentStatus = "paid";
     }
     if (req.body.orderStatus === "completed") {
-
       if (order) {
         const product = await Product.findById(order.productId);
         if (product) {
@@ -182,8 +181,6 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
 
-    
-
     res.status(200).json({ message: "Order status updated", order });
   } catch (error) {
     console.error("Update Order Error:", error);
@@ -210,6 +207,23 @@ export const extendOrder = async (req, res) => {
     // Update the order
     order.days += Number(extendDays);
     order.total += Number(additionalAmount);
+
+    // Calculate and update the new delivery date based on extended days
+    // Check if deliveryDate is valid
+    const currentDeliveryDate = new Date(order.deliveryDate);
+
+    // If current deliveryDate is valid, add the extended days to it
+    if (isNaN(currentDeliveryDate.getTime())) {
+      // If the date is invalid, use the current date as base
+      const newDeliveryDate = new Date();
+      newDeliveryDate.setDate(newDeliveryDate.getDate() + Number(extendDays));
+      order.deliveryDate = newDeliveryDate;
+    } else {
+      // Add extended days to the current delivery date
+      currentDeliveryDate.setDate(currentDeliveryDate.getDate());
+      order.deliveryDate = currentDeliveryDate;
+    }
+
     await order.save();
     console.log(order);
 
@@ -445,8 +459,6 @@ export const updateOrderAfterPayment = async (req, res, next) => {
         },
       }
     );
-
-    
 
     // const customerNotification = {
     //   recipientId: req.user._id,

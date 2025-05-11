@@ -8,8 +8,8 @@ const Contact = () => {
 
   // Business location coordinates
   const businessLocation = {
-    lat: 37.7749,
-    lng: -122.4194
+    lat: 27.6926,
+    lng: 85.3748
   }
 
   // Map container style
@@ -55,13 +55,13 @@ const Contact = () => {
             <div className="mt-4">
               <h3 className="text-lg font-medium text-gray-800">Address</h3>
               <p className="mt-2 text-gray-600">
-                123 Rental Plaza<br />
-                San Francisco, CA 94107
+                Durbar Planning<br />
+                Kadaghari, Kathmandu 44600
               </p>
             </div>
 
             <p className="mt-4 text-gray-600">
-              Our main office and showroom is conveniently located in downtown San Francisco,
+              Our main office is conveniently located in Kadaghari,
               with easy access to public transportation and nearby parking.
             </p>
           </div>
@@ -78,9 +78,9 @@ const Contact = () => {
                   <svg className="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <a href="tel:+14155551234" className="ml-3 text-lg font-semibold text-blue-600 hover:underline">(415) 555-1234</a>
+                  <a href="tel:+14155551234" className="ml-3 text-lg font-semibold text-blue-600 hover:underline">(+977) 9868137884</a>
                 </div>
-                <p className="mt-2 text-sm text-gray-500">Available Mon-Fri: 9AM - 6PM</p>
+                <p className="mt-2 text-sm text-gray-500">Available Sun-Fri: 7AM - 5PM</p>
               </div>
 
               <div className="bg-green-50 p-6 rounded-lg border-l-4 border-green-500">
@@ -90,7 +90,7 @@ const Contact = () => {
                   <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <a href="tel:+14155555678" className="ml-3 text-lg font-semibold text-green-600 hover:underline">(415) 555-5678</a>
+                  <a href="tel:+14155555678" className="ml-3 text-lg font-semibold text-green-600 hover:underline">(+977) 9868137884</a>
                 </div>
                 <p className="mt-2 text-sm text-gray-500">Available 24/7 for emergencies</p>
               </div>
@@ -102,9 +102,9 @@ const Contact = () => {
                   <svg className="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <a href="tel:+14155559876" className="ml-3 text-lg font-semibold text-purple-600 hover:underline">(415) 555-9876</a>
+                  <a href="tel:+14155559876" className="ml-3 text-lg font-semibold text-purple-600 hover:underline">(+977) 9868137884</a>
                 </div>
-                <p className="mt-2 text-sm text-gray-500">Available Mon-Fri: 9AM - 5PM</p>
+                <p className="mt-2 text-sm text-gray-500">Available Sun-Fri: 7AM - 5PM</p>
               </div>
 
               <div className="bg-amber-50 p-6 rounded-lg border-l-4 border-amber-500">
@@ -114,25 +114,25 @@ const Contact = () => {
                   <svg className="h-6 w-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <a href="tel:+14155554321" className="ml-3 text-lg font-semibold text-amber-600 hover:underline">(415) 555-4321</a>
+                  <a href="tel:+14155554321" className="ml-3 text-lg font-semibold text-amber-600 hover:underline">(+977) 9868137884</a>
                 </div>
-                <p className="mt-2 text-sm text-gray-500">Available Mon-Sat: 8AM - 7PM</p>
+                <p className="mt-2 text-sm text-gray-500">Available Sun-Fri: 7AM - 5PM</p>
               </div>
             </div>
 
             <div className="mt-8">
               <h3 className="text-lg font-medium text-gray-800">Email Us</h3>
               <p className="mt-2 text-gray-600">
-                General Inquiries: <a href="mailto:info@rentalco.com" className="text-blue-600 hover:underline">info@rentalco.com</a>
+                General Inquiries: <a href="mailto:info@rentalco.com" className="text-blue-600 hover:underline">dhakalmausham41@gmail.com</a>
               </p>
             </div>
 
             <div className="mt-8">
               <h3 className="text-lg font-medium text-gray-800">Business Hours</h3>
               <p className="mt-2 text-gray-600">
-                Monday - Friday: 9:00 AM - 6:00 PM<br />
-                Saturday: 10:00 AM - 4:00 PM<br />
-                Sunday: Closed
+                Sunday - Friday: 7:00 AM - 5:00 PM<br />
+                Saturday: Closed<br />
+                
               </p>
             </div>
           </div>
@@ -143,7 +143,7 @@ const Contact = () => {
           <h2 className="text-2xl font-semibold mb-8 text-center">Why Choose Our Rental Service</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">10,000+</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2">30+</div>
               <div className="text-gray-600">Available Items</div>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-md text-center">

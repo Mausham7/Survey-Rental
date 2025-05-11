@@ -155,8 +155,7 @@ const Details = () => {
           <div className='flex flex-col justify-between  h-[31.25rem]'>
          
             <h1 className='text-orange-500 font-bold font-lg text-xl text-right hover:text flex-wrap'>Delivery within 5Hrs inside Valley</h1>
-          {/* <input className='border border-green-400 w-40'></input>
-            <button className='text-xl font-semibold text-white border rounded-md py-1 w-44 mr-4 bg-[#FFAD33]'>hello</button> */}
+         
 
             <h2 className='text-2xl font-medium'>{productData.pName}</h2>
 

@@ -30,6 +30,7 @@ import { handleKhaltiCallback } from "../controllers/khalti.controller.js";
 import { getNotifications, markAllNotificationsAsSeen, notificationCount } from "../controllers/notification.controller.js";
 import { addToCart, cartCount, clearCart, getCart, removeFromCart, syncCart, updateCartItem } from "../controllers/cart.controller.js";
 import { forgotPassword, forgotPasswordReset, verifyOtp } from "../controllers/forgotPassword.controller.js";
+import { sendReturnReminders } from "../controllers/remainder.controller.js";
 
 const router = Router();
 
@@ -70,6 +71,8 @@ router.route("/admin/order/getorder:id").get(verifyJWT, getOrderById);
 router.route("/admin/order/update").post(verifyJWT, updateOrderStatus);
 router.route("/order/extend").post(verifyJWT, extendOrder);
 router.route("/admin/order/delete:id").get(verifyJWT, deleteOrder);
+router.route("/send-reminders").get(sendReturnReminders);
+// router.get("/send-reminders", sendReturnReminders);
 
 //profile routes
 router.route("/user/getprofile").get(verifyJWT, getProfile);

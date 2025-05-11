@@ -76,14 +76,26 @@ export const getRecommendedProducts = async (req, res) => {
     const products = await Product.find({ _id: { $in: productIds } });
 
     // Step 3: Merge orderCount into product data
-    const productsWithCount = productIds.map((id) => {
-      const product = products.find((p) => p._id.toString() === id.toString());
-      const countObj = popularProducts.find((p) => p._id.toString() === id.toString());
-      return {
-        ...product.toObject(),
-        orderCount: countObj?.orderCount || 0,
-      };
-    });
+    const productsWithCount = productIds
+      .map((id) => {
+        const product = products.find(
+          (p) => p._id.toString() === id.toString()
+        );
+        const countObj = popularProducts.find(
+          (p) => p._id.toString() === id.toString()
+        );
+
+        if (!product) {
+          console.warn(`Product with id ${id} not found in products array`);
+          return null; // or skip, or return placeholder object
+        }
+
+        return {
+          ...product.toObject(),
+          orderCount: countObj?.orderCount || 0,
+        };
+      })
+      .filter(Boolean); // removes null entries
 
     res.status(200).json({ products: productsWithCount });
   } catch (error) {
@@ -91,7 +103,6 @@ export const getRecommendedProducts = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
-
 
 // Fetch product by ID
 export const getProductById = async (req, res) => {
@@ -175,16 +186,14 @@ export const updateFlashSale = async (req, res) => {
 };
 
 export const giveRating = async (req, res) => {
-  console.log(req.body)
+  console.log(req.body);
   try {
     const { productId, rating } = req.body;
 
     if (!productId || typeof rating !== "number" || rating < 1 || rating > 5) {
-      return res
-        .status(400)
-        .json({
-          message: "Invalid productId or rating (must be between 1 and 5).",
-        });
+      return res.status(400).json({
+        message: "Invalid productId or rating (must be between 1 and 5).",
+      });
     }
 
     const product = await Product.findById(productId);

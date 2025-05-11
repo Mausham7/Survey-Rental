@@ -93,6 +93,16 @@ const orderSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  reminderSent: {
+    twoDayReminder: {
+      type: Boolean,
+      default: false,
+    },
+    oneDayReminder: {
+      type: Boolean,
+      default: false,
+    },
+  },
 });
 
 export const Order = mongoose.model("Order", orderSchema);
