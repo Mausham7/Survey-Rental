@@ -48,3 +48,6 @@ export const forgot_password = `${url}/user/forgotpassword`;
 export const verify_opt = `${url}/user/verifyotp`;
 export const password_reset = `${url}/user/forgotpasswordreset`;
 
+//practice
+export const add_practice_data =`${url}/practice/add`
+

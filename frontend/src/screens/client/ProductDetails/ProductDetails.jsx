@@ -9,7 +9,7 @@ const ProductDetails = () => {
     <div>
       <Header />
       <Details />
-      <div className='h-36'></div>
+      <div className='h-96 '></div>
       <Footer />
     </div>
   )

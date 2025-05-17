@@ -315,7 +315,7 @@ const MyOrders = () => {
                         {order.orderStatus}
                       </span>
                     </td>
-                    <td className="px-6 py-4">{order.deliveryDate.toDateString()}</td>
+                    <td className="px-6 py-4">{ order.deliveryDate.toDateString()} </td>
                     <td className="px-6 py-4">{order.returnDate.toDateString()}</td>
                     <td className="px-6 py-4 space-x-2">
                       <button

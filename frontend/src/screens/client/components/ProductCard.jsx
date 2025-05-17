@@ -86,7 +86,7 @@ const ProductCard = ({ product }) => {
           </span>
         </div>
         <div className="flex justify-between w-full items-center" onClick={(e) => e.stopPropagation()}>
-          <h2 className="text-[#FFAD33] text-sm font-semibold">Rs {product.price} /Day</h2>
+          <h2 className="text-[#FFAD33] text-sm font-semibold">Rs {product.price}/Day</h2>
           <div className="flex space-x-2">
             <button
               className="bg-purple-100 hover:bg-gray-200  px-3 py-1.5 rounded-lg flex items-center justify-center transition-all duration-300 border border-gray-200 group disabled:opacity-50 disabled:cursor-not-allowed"

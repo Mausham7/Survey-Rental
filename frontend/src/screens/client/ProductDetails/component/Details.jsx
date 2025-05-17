@@ -4,7 +4,7 @@ import { FaTruckFast } from "react-icons/fa6";
 import { GiReturnArrow } from "react-icons/gi";
 import { useNavigate, useParams } from 'react-router-dom';
 import Carousel from './Carousel';
-import { add_to_cart, getProductById, imageUrl } from '../../../../api/Api';
+import { add_practice_data, add_to_cart, getProductById, imageUrl } from '../../../../api/Api';
 
 
 const Details = () => {
@@ -17,7 +17,26 @@ const Details = () => {
   const [quantity, setQuantity] = useState(1)
   const [duration, setDuration] = useState('days')
   const [deliveryDate, setDeliveryDate] = useState('')
+  
+  const [name, setName]=useState("")
+  const[number, setNumber]=useState()
 
+  const addInformation=async(e)=>{
+    e.preventDefault()
+    try {
+      const result=await fetch(add_practice_data,{
+        method:"POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({name,number})
+      })
+      const data=await result.json()
+      if(data){alert(data.message)}
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
 
 
@@ -144,14 +163,14 @@ const Details = () => {
   };
 
   return (
-    <div className='mb-20'>
+    <div className='mb-20  '>
       <div className='hidden showCarousel:flex  h-[31.25rem]  w-[75.6875rem] mx-auto mt-4 gap-8'>
         <img
           src={`${imageUrl}/${productData.image}`}
           alt={`image`}
           className='h-[31.25rem] w-[550px]'
         />
-        <div className='flex-1  h-[31.25rem]'>
+        <div className='flex-1  h-[31.25rem] '>
           <div className='flex flex-col justify-between  h-[31.25rem]'>
          
             <h1 className='text-orange-500 font-bold font-lg text-xl text-right hover:text flex-wrap'>Delivery within 5Hrs inside Valley</h1>
@@ -269,6 +288,26 @@ const Details = () => {
                 Rent Now
               </button>
             </div>
+            <form >
+             <input
+             type='text'
+             placeholder='Name'
+             className='border-2 border-orange-500 outline-none p-1.5 w-full text-xl rounded-md'
+             onChange={(e)=>setName(e.target.value)}
+             />
+             <input
+             type='number'
+             placeholder='Number'
+             className='border-2 text-xl outline-none border-orange-400 w-full mt-5 p-1.5 rounded-md'
+             onChange={(e)=>setNumber(e.target.value)}
+             />
+             <div className='flex justify-start items-center'>
+               <button className='bg-orange-500 text-white outline-none mt-5 w-1/2 p-2 rounded-md' onClick={addInformation}>
+             Submit 
+             </button>
+             </div>
+            
+            </form>
           </div>
         </div>
       </div>

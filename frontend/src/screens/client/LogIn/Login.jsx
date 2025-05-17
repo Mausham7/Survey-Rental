@@ -68,8 +68,10 @@ const Login = () => {
         localStorage.setItem("role", data.user.role);
         if (data.user.role === "customer") {
           navigate(`/home`, { replace: true });
-        } else {
+        } else if(data.user.role === "admin") {
           navigate('/dashboard', { replace: true });
+        }else {
+          navigate("/");
         }
       } else {
         setIsLoading(false);

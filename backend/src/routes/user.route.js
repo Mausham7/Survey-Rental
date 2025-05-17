@@ -31,6 +31,7 @@ import { getNotifications, markAllNotificationsAsSeen, notificationCount } from 
 import { addToCart, cartCount, clearCart, getCart, removeFromCart, syncCart, updateCartItem } from "../controllers/cart.controller.js";
 import { forgotPassword, forgotPasswordReset, verifyOtp } from "../controllers/forgotPassword.controller.js";
 import { sendReturnReminders } from "../controllers/remainder.controller.js";
+import { addInformation } from "../controllers/practice.controller.js";
 
 const router = Router();
 
@@ -103,5 +104,8 @@ router.route("/cart/sync").post(verifyJWT, syncCart);
 router.route("/user/forgotpassword").post(forgotPassword);
 router.route("/user/verifyotp").post(verifyOtp);
 router.route("/user/forgotpasswordreset").post(forgotPasswordReset);
+
+//practice route
+router.route("/practice/add").post(addInformation)
 
 export default router;
