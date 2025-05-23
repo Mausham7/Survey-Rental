@@ -134,7 +134,7 @@ const Products = () => {
                   type="checkbox"
                   checked={inStockOnly}
                   onChange={() => setInStockOnly(!inStockOnly)}
-                  className="h-5 w-5"
+                  className="h-5 w-5 accent-orange-300"
                 />
                 <span className="ml-2 text-lg font-medium text-black-700">In Stock Only</span>
               </label>

@@ -26,12 +26,12 @@ import {
   updateOrderStatus,
 } from "../controllers/order.controller.js";
 import { getAllUsers, getProfile, getStats, updateProfile } from "../controllers/user.controller.js";
-import { handleKhaltiCallback } from "../controllers/khalti.controller.js";
+import { confirmKhaltiOrder, handleKhaltiCallback } from "../controllers/khalti.controller.js";
 import { getNotifications, markAllNotificationsAsSeen, notificationCount } from "../controllers/notification.controller.js";
 import { addToCart, cartCount, clearCart, getCart, removeFromCart, syncCart, updateCartItem } from "../controllers/cart.controller.js";
 import { forgotPassword, forgotPasswordReset, verifyOtp } from "../controllers/forgotPassword.controller.js";
 import { sendReturnReminders } from "../controllers/remainder.controller.js";
-import { addInformation } from "../controllers/practice.controller.js";
+
 
 const router = Router();
 
@@ -81,7 +81,8 @@ router.route("/user/updateprofile").put(verifyJWT, updateProfile);
 
 //khalti routes
 
-router.route("/callback").get(handleKhaltiCallback, updateOrderAfterPayment);
+// router.route("/callback").get(handleKhaltiCallback, updateOrderAfterPayment);
+router.route("/callback").get(handleKhaltiCallback,confirmKhaltiOrder,updateOrderAfterPayment);
 
 
 //Notification routes
@@ -105,7 +106,6 @@ router.route("/user/forgotpassword").post(forgotPassword);
 router.route("/user/verifyotp").post(verifyOtp);
 router.route("/user/forgotpasswordreset").post(forgotPasswordReset);
 
-//practice route
-router.route("/practice/add").post(addInformation)
+
 
 export default router;

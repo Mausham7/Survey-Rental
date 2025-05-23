@@ -150,6 +150,20 @@ export const updateOrderStatus = async (req, res) => {
         order.orderStatus
       }.`,
     };
+     const admins = await User.find({ role: "admin" });
+    for (const admin of admins) {
+      await createNotification({
+        recipientId: admin._id,
+        recipientModel: "User",
+        orderId: order.trackingNumber,
+        type: "order_status_change",
+        title: "Order Status Changed",
+        isRead: false,
+        message: `The order status with trackingNumber #${order?.trackingNumber.toString()} has been changed to ${
+        order.orderStatus
+      }.`,
+      });
+    }
 
     await createNotification(customerNotification);
     if (req.body.orderStatus === "shipped") {
@@ -170,6 +184,20 @@ export const updateOrderStatus = async (req, res) => {
       await sendEmail({
         email: order.emailAddress,
         subject: "Your Order has been delivered!",
+        message: `
+              Dear ${order.fullName},
+              
+              We have delivered your order on your location. Thank you for choosing Us!
+              
+              Best regards,
+              Your Survey Rental Team
+            `,
+      });
+    }
+    if (req.body.orderStatus === "cancelled") {
+      await sendEmail({
+        email: order.emailAddress,
+        subject: "Your Order has been cancelled!",
         message: `
               Dear ${order.fullName},
               
@@ -237,6 +265,7 @@ export const extendOrder = async (req, res) => {
     };
     console.log(formData);
     const admins = await User.find({ role: "admin" });
+    
     for (const admin of admins) {
       await createNotification({
         recipientId: admin._id,
@@ -248,6 +277,17 @@ export const extendOrder = async (req, res) => {
         message: `Order of tracking number: #${order.trackingNumber} has been extended by ${req.user.fullName}.`,
       });
     }
+    //  recipientId: req.user._id,
+    await createNotification({
+        recipientId: req.user._id,
+        recipientModel: "User",
+        orderId: order.trackingNumber,
+        type: "order_placed",
+        title: "Order Extended",
+        isRead: false,
+        message: `Order of tracking number: #${order.trackingNumber} has been extended by ${req.user.fullName}.`,
+      });
+
     callKhalti(formData, order, req, res);
 
     // res.status(200).json({
@@ -408,18 +448,19 @@ export const addMultipleOrders = async (req, res) => {
         message: `New order #${trackingNumber} placed by ${req.user.fullName}.`,
       });
     }
-    await sendEmail({
-      email: email,
-      subject: "Thank you for placing Order!",
-      message: `
-            Dear ${fullName},
+    //uncomment if you want to display the order placed message.
+    // await sendEmail({
+    //   email: email,
+    //   subject: "Thank you for placing Order!",
+    //   message: `
+    //         Dear ${fullName},
             
-            We have received your order. Thank you for choosing Us!
+    //         We have received your order. Thank you for choosing Us!
             
-            Best regards,
-            Your Survey Rental Team
-          `,
-    });
+    //         Best regards,
+    //         Your Survey Rental Team
+    //       `,
+    // });
 
     // ✅ Handle payment
     if (paymentMethod === "khalti") {
@@ -433,11 +474,14 @@ export const addMultipleOrders = async (req, res) => {
       };
       return callKhalti(formData, orders, req, res);
     }
+  
 
     // ✅ Return success
     return res
       .status(201)
       .json({ message: "Order created successfully", orders });
+
+      
   } catch (error) {
     console.error("Multiple Order Error:", error);
     return res.status(500).json({ error: "Failed to place orders" });
@@ -471,6 +515,7 @@ export const updateOrderAfterPayment = async (req, res, next) => {
     // console.log(customerNotification);
 
     res.redirect("http://localhost:5173/myorders");
+    // next();
   } catch (err) {
     return res
       .status(400)

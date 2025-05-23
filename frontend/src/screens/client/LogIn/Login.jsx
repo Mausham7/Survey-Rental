@@ -3,6 +3,7 @@ import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import { Link, useNavigate } from 'react-router-dom'
 import { manual_login, resend_verification } from "../../../api/Api";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import loginimg from "../../../assets/login-img.jpeg"
 
 const Login = () => {
   const navigate = useNavigate();
@@ -14,6 +15,18 @@ const Login = () => {
   const [showVerificationResend, setShowVerificationResend] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState("");
+
+useEffect(() => {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  if (token && role === "admin") {
+    navigate("/dashboard");
+  } else if (token && role === "customer") {
+    navigate("/home");
+  }
+}, [navigate]);
+
 
   const handleSignUp = () => {
     navigate("/signup")
@@ -134,19 +147,22 @@ const Login = () => {
           <CircularProgress />
         </div>
       )}
-      <img className='hidden  showPicture:block h-[71%] m-10' src="https://media.istockphoto.com/id/1341716354/photo/construction-worker-working-in-construction-site.jpg?s=2048x2048&w=is&k=20&c=ruiGdpgCEo-ehs6TlLqp7L1dwM86QbMVYwPNlIgdKnc=" alt="picture" />
-      <div className=' w-[55vh] flex flex-col gap-5 '>
-        <center className='text-3xl font-normal text-[#ffad33]'>Log in</center>
-        <center className='text-3xl font-normal text-[#ffad33]'>Survey Equipment Rental</center>
+      <img className='hidden  showPicture:block h-[71%] m-10' src={loginimg} alt="picture" />
+      <div className=' w-[55vh] flex flex-col gap-5  -mt-14 '>
+        <center className='text-2xl font-semibold text-[#ffad33]'>Log in</center>
+        <center className='text-2xl font-semibold text-[#ffad33]'>Survey Equipment Rental</center>
         {/* <h3>Enter your details below</h3> */}
-        <form onSubmit={handleLogin} className='flex flex-col gap-10 '>
+        <form onSubmit={handleLogin} className='flex flex-col  '>
+          
           {error && <div className="w-full text-red-400 text-sm">{error}</div>}
           {resendMessage && <div className="w-full text-green-500 text-sm">{resendMessage}</div>}
-          
+
+          <div className="flex flex-col gap-10 mb-12">
+
           <input
             type="email"
-            placeholder='E-mail or Phone Number'
-            className='border-b-2 h-10 outline-none'
+            placeholder=' Enter your email'
+            className='border-b-2 h-10 outline-none mt-5'
             value={email}
             onChange={(e) => setEmail(e.target.value)} />
   
@@ -165,6 +181,7 @@ const Login = () => {
               {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
             </span>
                        
+          </div>
           </div>
           
           <button type="submmit" className='text-xl text-white border rounded-md p-2 px-4 bg-[#FFAD33]' >Log In</button>

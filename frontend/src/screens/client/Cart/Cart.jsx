@@ -17,6 +17,8 @@ const CartPage = () => {
 
   const token = localStorage.getItem('token');
 
+  console.log("cart.jsx", cart)
+
   //function to load cart data
   const loadCart = async () => {
     setIsLoading(false);

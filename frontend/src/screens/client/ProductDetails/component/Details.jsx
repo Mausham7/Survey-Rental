@@ -21,22 +21,6 @@ const Details = () => {
   const [name, setName]=useState("")
   const[number, setNumber]=useState()
 
-  const addInformation=async(e)=>{
-    e.preventDefault()
-    try {
-      const result=await fetch(add_practice_data,{
-        method:"POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({name,number})
-      })
-      const data=await result.json()
-      if(data){alert(data.message)}
-    } catch (error) {
-      console.log(error)
-    }
-  }
 
 
 
@@ -288,26 +272,7 @@ const Details = () => {
                 Rent Now
               </button>
             </div>
-            <form >
-             <input
-             type='text'
-             placeholder='Name'
-             className='border-2 border-orange-500 outline-none p-1.5 w-full text-xl rounded-md'
-             onChange={(e)=>setName(e.target.value)}
-             />
-             <input
-             type='number'
-             placeholder='Number'
-             className='border-2 text-xl outline-none border-orange-400 w-full mt-5 p-1.5 rounded-md'
-             onChange={(e)=>setNumber(e.target.value)}
-             />
-             <div className='flex justify-start items-center'>
-               <button className='bg-orange-500 text-white outline-none mt-5 w-1/2 p-2 rounded-md' onClick={addInformation}>
-             Submit 
-             </button>
-             </div>
-            
-            </form>
+           
           </div>
         </div>
       </div>

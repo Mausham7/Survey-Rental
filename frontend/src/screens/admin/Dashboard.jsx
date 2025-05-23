@@ -3,7 +3,7 @@ import Menu from './component/Menu'
 import Data from './component/Data';
 import { MdSort } from "react-icons/md";
 import { add_product, editStock, getAllProducts, updateInFlashSale, updateInStock } from '../../api/Api';
-
+import adminImage from '../../assets/images.jpg'
 
 
 const Dashboard = () => {
@@ -174,7 +174,6 @@ const Dashboard = () => {
     <div className='flex'>
       <Menu />
       <div className='w-full ml-52 flex-col justify-items-center  '>
-
         <Data/>
         <div className='h-auto w-[95%] border rounded-lg'>
           <div className='p-3 flex justify-between'>

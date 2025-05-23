@@ -56,11 +56,11 @@ const Data = () => {
         <h1 className=' text-gray-400 my-2'> Total Number of Customers </h1>
         <h1 className='text-4xl'>{stats.totalCustomers}</h1>
       </div>
-      <div className='w-[25%] pl-7 '>
+      <div className='w-[25%] pl-7 border-r'>
         <div className='h-16 w-16 flex justify-center text-xl items-center border bg-[#ffe8c6] rounded-full'>
           <GrOrderedList />
         </div>
-        <h1 className=' text-gray-400 my-2'> Total Orders </h1>
+        <h1 className=' text-gray-400  my-2'> Total Orders </h1>
         <h1 className='text-4xl'>{stats.totalSales}</h1>
       </div>
       <div className='w-[25%] pl-7 border-r'>

@@ -7,7 +7,7 @@ import Landing from './screens/client/Landing/Landing.jsx'
 import SignUp from './screens/client/SignUp/SignUp.jsx'
 import Login from './screens/client/LogIn/Login.jsx'
 import ViewProducts from './screens/client/ViewProducts/ViewProducts.jsx'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'
 import Contact from './screens/client/Contact/Contact.jsx';
 import RentNow from './screens/client/RentNow/RentNow.jsx';
 import ProductDetails from './screens/client/ProductDetails/ProductDetails.jsx';
@@ -26,7 +26,9 @@ import ForgotPassword from './screens/client/LogIn/ForgotPassword.jsx';
 
 import ProtectedRoute from './ProtectedRoutes.jsx';
 
-const role = localStorage.getItem("role") // You should get this from context or state ideally
+// const role = localStorage.getItem("role") // You should get this from context or state ideally
+// const token = localStorage.getItem("token") // You should get this from context or state ideally
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -35,54 +37,71 @@ createRoot(document.getElementById('root')).render(
         <Route path="/" element={<App />}>
           <Route index element={<Login />} />
           <Route path="signup" element={<SignUp />} />
-          <Route path="home" element={<Landing />} />
-          <Route path="products" element={<ViewProducts />} />
-          <Route path="buyproduct/:id" element={<RentNow />} />
-          <Route path="/rent-now/multi" element={<RentNowMultiple />} />
           <Route path="contact" element={<Contact />} />
-          <Route path="product/:productId" element={<ProductDetails />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
 
           {/* CLIENT Routes */}
+
+           <Route path="home" element={
+            <ProtectedRoute allowedRoles={['customer']} >
+              <Landing /></ProtectedRoute>
+          } />
+           <Route path="products" element={
+            <ProtectedRoute allowedRoles={['customer']} >
+              <ViewProducts /></ProtectedRoute>
+          } />
+           <Route path="buyproduct/:id" element={
+            <ProtectedRoute allowedRoles={['customer']} >
+              <RentNow /></ProtectedRoute>
+          } />
+           <Route path="/rent-now/multi" element={
+            <ProtectedRoute allowedRoles={['customer']} >
+              <RentNowMultiple /></ProtectedRoute>
+          } />
+           <Route path="product/:productId" element={
+            <ProtectedRoute allowedRoles={['customer']} >
+              <ProductDetails /></ProtectedRoute>
+          } />
+
           <Route path="myorders" element={
-            <ProtectedRoute allowedRoles={['customer']} role={role}>
+            <ProtectedRoute allowedRoles={['customer']} >
               <MyOrders />
             </ProtectedRoute>
           } />
           <Route path="myprofile" element={
-            <ProtectedRoute allowedRoles={['customer']} role={role}>
+            <ProtectedRoute allowedRoles={['customer']} >
               <UserProfile />
             </ProtectedRoute>
           } />
           <Route path="cart" element={
-            <ProtectedRoute allowedRoles={['customer']} role={role}>
+            <ProtectedRoute allowedRoles={['customer']}>
               <CartPage />
             </ProtectedRoute>
           } />
           <Route path="notification" element={
-            <ProtectedRoute allowedRoles={['customer']} role={role}>
+            <ProtectedRoute allowedRoles={['customer']}>
               <Notification />
             </ProtectedRoute>
           } />
 
           {/* ADMIN Routes */}
           <Route path="dashboard" element={
-            <ProtectedRoute allowedRoles={['admin']} role={role}>
+            <ProtectedRoute allowedRoles={['admin']} >
               <Dashboard />
             </ProtectedRoute>
           } />
           <Route path="orders" element={
-            <ProtectedRoute allowedRoles={['admin']} role={role}>
+            <ProtectedRoute allowedRoles={['admin']} >
               <Orders />
             </ProtectedRoute>
           } />
           <Route path="adminnotification" element={
-            <ProtectedRoute allowedRoles={['admin']} role={role}>
+            <ProtectedRoute allowedRoles={['admin']} >
               <AdminNotification />
             </ProtectedRoute>
           } />
           <Route path="allusers" element={
-            <ProtectedRoute allowedRoles={['admin']} role={role}>
+            <ProtectedRoute allowedRoles={['admin']} >
               <UserList />
             </ProtectedRoute>
           } />

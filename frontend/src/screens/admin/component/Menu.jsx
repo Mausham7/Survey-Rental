@@ -7,16 +7,23 @@ import { MdOutlineShoppingCart } from "react-icons/md";
 import { FaUsers } from "react-icons/fa";
 import { HiOutlineHome } from "react-icons/hi";
 import { BiNotification } from 'react-icons/bi';
+import { RiDashboardHorizontalFill } from "react-icons/ri";
 // import { IoSettings } from "react-icons/io5";
 
 
 
 const Menu = () => {
   const navigate = useNavigate()
-  const handleLogOut = () => {
-    console.log("logout")
-    navigate("/")
+const handleLogOut = () => {
+  const confirmLogout = window.confirm("Are you sure you want to logout?");
+  if (confirmLogout) {
+    console.log("logout");
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+   navigate("/", { replace: true }); ;
   }
+};
+
   return (
     <div className='fixed'>
       <div className='w-52 h-screen bg-[#FFAD33] flex flex-col pl-10 '>
@@ -30,13 +37,26 @@ const Menu = () => {
         //     : "hover:cursor-pointer"
         // }
         >
-          <MdOutlineDashboardCustomize /> Dashboard
+          < RiDashboardHorizontalFill/> Dashboard
         </NavLink>
         <NavLink to="/orders" className={'flex items-center my-3 gap-3 text-lg'}> <MdOutlineShoppingCart /> Orders</NavLink>
         <NavLink to="/adminnotification" className={'flex items-center my-3 gap-3 text-lg'}> <BiNotification /> Notifications</NavLink>
         <NavLink to="/allusers" className={'flex items-center my-3 gap-3 text-lg'}><FaUsers />Customers</NavLink>
         {/* <NavLink className={'flex items-center my-3 gap-3 text-lg'}> <HiOutlineHome />Home</NavLink> */}
-        <NavLink to="/" className={'flex  items-center my-[24rem] gap-3 text-lg'}><MdLogout className="text-5xl" onClick={handleLogOut} />Logout</NavLink>
+        {/* <NavLink to="/" className={'flex  items-center my-[24rem] gap-3 text-lg'}> <MdLogout className="text-5xl" onClick={handleLogOut} />Logout</NavLink> */}
+
+        <NavLink
+          to="/"
+          onClick={(e) => {
+          e.preventDefault();
+          handleLogOut();     
+           }}
+         className={'flex items-center my-[20rem] gap-3 text-lg'}
+        >
+  <MdLogout className="text-5xl" />Logout
+</NavLink>
+
+
       </div>
     </div>
   )

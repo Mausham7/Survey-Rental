@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { manual_register } from "../../../api/Api";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import imagesignup from "../../../assets/signup-img.webp"
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -93,8 +94,8 @@ const SignUp = () => {
         </div>
       )}
       <img
-        className="h-[80vh] m-10"
-        src="https://i.pinimg.com/736x/9b/6e/de/9b6ededcfdea6d42e2838be4a19c40ae.jpg"
+        className="h-[55vh] m-10"
+        src={imagesignup}
         alt="picture"
       />
       <div className=" w-[55vh] flex flex-col gap-8 ">

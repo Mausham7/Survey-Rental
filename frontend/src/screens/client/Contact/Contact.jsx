@@ -8,8 +8,8 @@ const Contact = () => {
 
   // Business location coordinates
   const businessLocation = {
-    lat: 27.6926,
-    lng: 85.3748
+    lat:  27.69471,
+    lng:  85.3659
   }
 
   // Map container style

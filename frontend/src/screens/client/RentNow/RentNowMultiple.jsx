@@ -9,6 +9,7 @@ const RentNowMultiple = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  console.log("cart data", cartItems)
 
   const [formData, setFormData] = useState({
     paymentMethod: 'COD',
@@ -131,7 +132,7 @@ const RentNowMultiple = () => {
     formDataToSend.append('townCity', formData.townCity);
     formDataToSend.append('phone', formData.phone);
     formDataToSend.append('email', formData.email);
-    formDataToSend.append('totalAmount', calculateTotal().toFixed(2));
+    formDataToSend.append('totalAmount', calculateTotal());
 
     // Add image file if available
     if (formData.image) {
@@ -199,12 +200,31 @@ const RentNowMultiple = () => {
   const calculateDeliveryCharge = () => {
     // 200 per item
     // return cartItems.reduce((sum, item) => sum + (item.quantity * 200), 0);
-    return 200;
+      return (cartItems || []).reduce((sum, item) => {
+      const itemTotal = item.total || 0;
+      return sum + itemTotal;
+    }, 0);
+  };
+
+  
+  const totalQuantity = () => {
+    return (cartItems || []).reduce((sum, item) => {
+      const quantityTotal = item.quantity || 0;
+      return sum + quantityTotal;
+    }, 0);
   };
 
   const calculateTotal = () => {
-    return calculateSubtotal() + calculateDeliveryCharge();
-  };
+  const subtotal = calculateSubtotal();
+  const quantity = totalQuantity();
+
+  if (typeof subtotal !== 'number' || typeof quantity !== 'number') {
+    return "0.00";
+  }
+
+  return (subtotal + quantity * 200).toFixed(2);
+};
+
 
   if (loading) return <div>Loading checkout details...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -330,7 +350,7 @@ const RentNowMultiple = () => {
                     </div>
                   </div>
                   <div>
-                    <h3>Rs {item.total?.toFixed(2) || "0.00"}</h3>
+                    <h3>Rs {item.total?.toFixed(2) || "0.00"} </h3>
                   </div>
                 </div>
               </div>
@@ -343,12 +363,12 @@ const RentNowMultiple = () => {
 
             <div className='py-3 border-t border-gray-300 flex justify-between'>
               <span>Delivery Charge:</span>
-              <span>Rs {calculateDeliveryCharge().toFixed(2)}</span>
+              <span className="font-medium">Rs {(totalQuantity() * 200).toFixed(0)}</span>
             </div>
 
             <div className='py-3 border-t border-b border-gray-300 flex justify-between font-bold'>
               <span>Total:</span>
-              <span>Rs {calculateTotal().toFixed(2)}</span>
+              <span>Rs {calculateTotal()} </span>
             </div>
 
             <div className='my-6'>

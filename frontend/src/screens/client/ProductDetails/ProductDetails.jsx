@@ -1,15 +1,16 @@
 
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import Details from './component/details'
+
 import FlashSales from '../Landing/components/FlashSales'
+import Details from './component/Details'
 
 const ProductDetails = () => {
   return (
     <div>
       <Header />
       <Details />
-      <div className='h-96 '></div>
+      <div className='h-52 '></div>
       <Footer />
     </div>
   )

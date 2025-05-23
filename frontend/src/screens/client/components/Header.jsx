@@ -291,7 +291,8 @@ const Header = () => {
                   onClick={() => {
                     localStorage.removeItem("token");
                     localStorage.removeItem("userId");
-                    navigate("/");
+                    localStorage.removeItem("role");
+                   navigate("/", { replace: true }); ;
                     setShowProfileDropdown(false);
                   }}
                 >
